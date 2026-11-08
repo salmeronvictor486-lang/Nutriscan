@@ -39,7 +39,9 @@ Móvil (PWA: index.html)                 Supabase
 |---|---|
 | `index.html` | La app completa (HTML + CSS + JS en un solo archivo). |
 | `config.js` | URL y anon key de Supabase (públicas). |
-| `manifest.webmanifest`, `sw.js`, `icons/` | Instalación como app y funcionamiento offline del shell. |
+| `manifest.webmanifest`, `sw.js`, `icons/` | Instalación como app (PWA), atajos, capturas y funcionamiento offline del shell. |
+| `android/`, `capacitor.config.json`, `package.json` | Proyecto Android nativo (Capacitor 8) que empaqueta la misma app. |
+| `.github/workflows/` | Publicación automática de la web y del APK. |
 | `supabase/migrations/…_init.sql` | Tablas, políticas RLS, bucket de fotos y triggers. |
 | `supabase/functions/nutriscan-ai/index.ts` | API segura: claves, análisis de fotos, búsqueda de alimentos, chat y borrado de cuenta. |
 
@@ -86,8 +88,17 @@ supabase functions deploy nutriscan-ai
 
 Cuando tengas dominio propio, limita CORS con `supabase secrets set ALLOWED_ORIGIN=https://tudominio.com`.
 
-### 3. Publicar la app
-Es un sitio estático: sirve la carpeta raíz en **GitHub Pages**, **Netlify** o **Vercel** (las tres tienen plan gratuito y HTTPS, que es obligatorio para la cámara y para instalar la PWA).
+### 3. Publicar la app (automático con GitHub)
+Al fusionar en `main`, dos flujos de GitHub Actions lo hacen todo solos:
+
+| Flujo | Qué hace | Resultado |
+|---|---|---|
+| `pages.yml` | Publica la web | `https://salmeronvictor486-lang.github.io/Nutriscan/` |
+| `android.yml` | Compila el APK de Android | `…/releases/download/android-latest/NutriScan.apk` |
+
+Hay que hacer **una sola vez**: *Settings → Pages → Source: GitHub Actions*. Si el repositorio es privado, GitHub Pages necesita un plan de pago y las descargas de la release requieren iniciar sesión: hazlo **público** (las claves no están en el código, así que es seguro) o publica la web en Netlify o Vercel.
+
+Esas dos URL ya vienen en `config.js` (`APP_URL` y `ANDROID_APK_URL`). Si cambias de hosting, actualízalas.
 
 Para probarla en local:
 
@@ -95,10 +106,50 @@ Para probarla en local:
 python3 -m http.server 8080
 ```
 
-### 4. Instalar en el móvil
-- **Android (Chrome):** menú ⋮ → *Instalar aplicación*.
-- **iPhone (Safari):** Compartir → *Añadir a pantalla de inicio*.
-- **Play Store:** genera el paquete con [PWABuilder](https://www.pwabuilder.com) a partir de la URL publicada (cuenta de desarrollador de Google: 25 $ una sola vez). Si más adelante necesitas funciones nativas, se puede envolver con Capacitor sin rehacer la interfaz.
+---
+
+## 📱 Instalar en el móvil
+
+Comparte **un solo enlace** (o el QR que la web muestra en el ordenador). La app detecta el móvil y enseña los pasos adecuados.
+
+### iPhone (sin App Store)
+1. Abre el enlace en Safari (o Chrome/Edge, con iOS 16.4 o posterior).
+2. Pulsa **Compartir**, que en iOS 26 está dentro del botón `···`, y luego **Añadir a pantalla de inicio**.
+3. Listo: se abre a pantalla completa con su icono, igual que una app.
+
+Si el enlace se abre dentro de Instagram o WhatsApp, la app avisa de que hay que abrirlo antes en Safari.
+
+### Android
+- **Desde Chrome:** botón **Instalar** dentro de la app, o menú ⋮ y después *Instalar aplicación*. Es la opción recomendada.
+- **APK:** descarga `NutriScan.apk` desde la release `android-latest`, ábrelo y permite «instalar apps de este origen». Cada versión nueva se instala encima sin perder datos.
+
+Extras incluidos:
+- Atajo **«Escanear mi plato»** manteniendo pulsado el icono (Android).
+- Capturas en el diálogo de instalación de Android.
+- Iconos adaptativos y pantalla de carga con la marca.
+
+### ¿Y las tiendas oficiales?
+| | Requisitos | Cómo |
+|---|---|---|
+| **Google Play** | Cuenta de desarrollador (25 $, pago único). Para cuentas personales nuevas, prueba cerrada con 12 testers durante 14 días. | Crea tu propia clave de firma (no uses `nutriscan-test.keystore`) y genera el AAB con `cd android && ./gradlew bundleRelease`. |
+| **App Store** | Apple Developer Program (99 $/año) y un Mac con Xcode, o un servicio de compilación en la nube. | `npm i -D @capacitor/ios@8.5.3 && npx cap add ios && npm run ios:open`. Apple puede rechazar apps que sean «solo una web»: conviene añadir algo nativo antes (por ejemplo notificaciones). |
+
+Mi consejo con poco presupuesto: empieza con la **PWA en iPhone** y la **PWA o el APK en Android** (coste 0 €). Pasa a las tiendas cuando tengas usuarios que lo pidan.
+
+### Proyecto nativo (Capacitor)
+`android/` contiene el proyecto Android listo para abrir en Android Studio:
+
+```bash
+npm install
+```
+
+```bash
+npm run android:open
+```
+
+La app nativa carga el mismo `index.html`, así que cualquier cambio en la web llega al APK en la siguiente compilación.
+
+> ⚠️ `android/app/nutriscan-test.keystore` es una clave **de pruebas** pública, pensada para que el APK de GitHub se pueda actualizar sin desinstalar. Para Google Play usa una clave privada propia y no la subas al repositorio.
 
 ---
 

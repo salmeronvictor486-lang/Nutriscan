@@ -1,0 +1,10 @@
+{
+  "appId": "com.nutriscan.app",
+  "appName": "NutriScan",
+  "webDir": "www",
+  "backgroundColor": "#0F3B2C",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true
+  }
+}

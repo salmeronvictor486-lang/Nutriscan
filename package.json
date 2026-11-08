@@ -1,0 +1,21 @@
+{
+  "name": "nutriscan",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NutriScan — AI Food & Nutrition Tracker. Eat smart. Live better.",
+  "scripts": {
+    "build:web": "node scripts/build-web.mjs",
+    "sync": "npm run build:web && npx cap sync",
+    "android:apk": "npm run sync && cd android && ./gradlew assembleDebug",
+    "android:open": "npm run sync && npx cap open android",
+    "ios:open": "npm run sync && npx cap open ios"
+  },
+  "engines": { "node": ">=22" },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}

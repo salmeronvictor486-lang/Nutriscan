@@ -29,7 +29,7 @@
   --shadow-lg:0 24px 60px -20px rgba(15,59,44,.35);
   --r:22px; --r-sm:14px;
   --nav-h:76px;
-  --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:max(env(safe-area-inset-bottom,0px), var(--safe-area-inset-bottom,0px)); --safe-t:max(env(safe-area-inset-top,0px), var(--safe-area-inset-top,0px));
   --font-d:"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
   --font:"Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme: light;
@@ -106,7 +106,7 @@ h3{font-size:16px;font-weight:700}
 .pill.db{background:color-mix(in srgb,var(--c-protein) 18%, var(--surface));border-color:transparent;color:var(--ink)}
 
 /* Botones */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 20px;border-radius:16px;font-weight:700;font-size:15px;transition:transform .15s, opacity .15s, background .2s}
+.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 20px;border-radius:16px;font-weight:700;font-size:15px;transition:transform .15s, opacity .15s, background .2s}
 .btn:active{transform:scale(.97)}
 .btn[disabled]{opacity:.5;pointer-events:none}
 .btn.primary{background:var(--forest);color:var(--bg)}
@@ -346,6 +346,25 @@ textarea.input{height:auto;min-height:84px;padding:12px 14px;resize:vertical}
 .suggest{display:flex;flex-direction:column;gap:8px}
 .suggest button{text-align:left;padding:12px 14px;border-radius:16px;background:var(--surface);border:1px solid var(--line);font-weight:600;font-size:14px;display:flex;gap:10px;align-items:center}
 
+/* Instalación */
+.install-banner{display:flex;align-items:center;gap:12px;padding:12px 12px 12px 14px;border-radius:20px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);margin-bottom:14px;width:100%;text-align:left}
+.install-banner .app-ic{width:44px;height:44px;border-radius:12px;flex-shrink:0}
+.install-banner .t{flex:1;min-width:0}
+.install-banner .t b{display:block;font-size:14.5px}
+.install-banner .t span{font-size:12.5px;color:var(--muted)}
+.install-steps{display:grid;gap:10px;margin:14px 0}
+.install-steps .st{display:flex;gap:12px;align-items:center;padding:12px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.install-steps .n{width:30px;height:30px;border-radius:10px;background:var(--lime);color:#0F3B2C;font-family:var(--font-d);font-weight:800;display:grid;place-items:center;flex-shrink:0}
+.install-steps .st p{margin:0;font-size:14px}
+.kbd{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);font-weight:700;font-size:13px;white-space:nowrap}
+.kbd svg{width:15px;height:15px}
+.qr{width:180px;height:180px;margin:6px auto;padding:10px;background:#fff;border-radius:18px}
+.qr svg{width:100%;height:100%}
+.desk-qr{position:fixed;left:24px;bottom:24px;width:230px;z-index:30;text-align:center}
+@media (max-width:1100px),(pointer:coarse){.desk-qr{display:none}}
+.ios-arrow{position:fixed;left:50%;bottom:calc(8px + var(--safe-b));transform:translateX(-50%);z-index:70;color:var(--lime);animation:bob 1.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translate(-50%,8px)}}
+
 /* Perfil */
 .list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .list .li{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);width:100%;text-align:left}
@@ -417,6 +436,10 @@ textarea.input{height:auto;min-height:84px;padding:12px 14px;resize:vertical}
   <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
   <symbol id="i-bowl" viewBox="0 0 24 24"><path d="M3 11h18a9 9 0 0 1-18 0zM8 7c0-1.5 1-2 1-3.5M12 7c0-1.5 1-2 1-3.5M16 7c0-1.5 1-2 1-3.5"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></symbol>
+  <symbol id="i-plus-sq" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M11 18.5h2"/></symbol>
   <symbol id="logo" viewBox="0 0 512 512"><rect width="512" height="512" rx="116" fill="#0F3B2C"/><g fill="none" stroke="#C8F169" stroke-width="30" stroke-linecap="round"><path d="M120 176v-36a20 20 0 0 1 20-20h36M336 120h36a20 20 0 0 1 20 20v36M392 336v36a20 20 0 0 1-20 20h-36M176 392h-36a20 20 0 0 1-20-20v-36"/></g><path d="M256 150c58 28 86 74 80 128-5 44-38 78-80 84-42-6-75-40-80-84-6-54 22-100 80-128z" fill="#C8F169"/><path d="M256 196v156" stroke="#0F3B2C" stroke-width="14" stroke-linecap="round"/><path d="M256 250l-32-26M256 292l34-28" stroke="#0F3B2C" stroke-width="12" stroke-linecap="round"/><rect x="140" y="252" width="232" height="10" rx="5" fill="#fff" opacity=".9"/></symbol>
 </svg>
 
@@ -440,6 +463,22 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
   del(k) { try { localStorage.removeItem(k); } catch {} },
 };
+/* ─── Plataforma e instalación ─── */
+const UA = navigator.userAgent;
+const IS_NATIVE = !!window.Capacitor?.isNativePlatform?.();
+const IS_IOS = /iPhone|iPad|iPod/.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const IS_ANDROID = /Android/.test(UA);
+const IS_MOBILE = IS_IOS || IS_ANDROID;
+const IN_APP = /Instagram|FBAN|FBAV|FB_IAB|Line\/|TikTok|Snapchat|Twitter|LinkedInApp|GSA\//.test(UA);
+const IS_STANDALONE = () => IS_NATIVE || matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const WEB_URL = CFG.APP_URL || (IS_NATIVE ? "" : location.origin + location.pathname.replace(/index\.html$/, ""));
+let installPrompt = null;
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installPrompt = e; });
+window.addEventListener("appinstalled", () => {
+  installPrompt = null;
+  document.querySelectorAll(".install-banner").forEach((b) => b.remove());
+  setTimeout(() => toast("¡NutriScan instalada! Ábrela desde tu pantalla de inicio."), 300);
+});
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
 
 /* ─── Nutrientes ─── */
@@ -694,7 +733,8 @@ function rerenderKeepScroll() { const y = window.scrollY; render(); window.scrol
 /* ════════════════ Pantallas previas ════════════════ */
 function vSetup() {
   return `<div style="padding-top:10px">${logoHTML()}
-  <h1 style="margin:28px 0 10px">Conecta tu base de datos</h1>
+  <div style="height:18px"></div>${installBanner()}
+  <h1 style="margin:10px 0 10px">Conecta tu base de datos</h1>
   <p class="muted">NutriScan guarda cuentas, comidas y fotos en <b>Supabase</b>. Aún no está configurado en <code>config.js</code>, así que el registro en la nube está <b>pendiente</b>.</p>
   <div class="card" style="margin:18px 0">
     <ol style="margin:0;padding-left:18px;display:grid;gap:8px;font-size:14px">
@@ -732,6 +772,7 @@ function vAuth() {
     <div class="auth-hero"><div class="logo"><svg class="mark" style="width:40px;height:40px"><use href="#logo"/></svg><b style="color:#fff">Nutri<em style="color:#C8F169">Scan</em></b></div>
       <div class="slogan">Eat smart.<br><em>Live better.</em></div><p style="margin:0;color:#A8C2B3">Tu alimentación, analizada inteligentemente.</p></div></div>
   <div style="padding-top:22px">
+    ${installBanner()}
     <div class="seg" style="margin-bottom:20px"><button class="${!reg ? "on" : ""}" data-act="auth-mode" data-m="login">Iniciar sesión</button><button class="${reg ? "on" : ""}" data-act="auth-mode" data-m="register">Crear cuenta</button></div>
     <form id="auth-form" autocomplete="on">
       ${reg ? `<div class="field"><label class="f" for="a-name">Nombre o alias</label><input class="input" id="a-name" autocomplete="nickname" maxlength="40" placeholder="¿Cómo te llamamos?"></div>` : ""}
@@ -756,7 +797,7 @@ afterRender.auth = () => {
     try {
       if (authMode === "register") {
         const display_name = $("#a-name").value.trim();
-        const { data, error } = await sb.auth.signUp({ email, password, options: { data: { display_name, health_consent: "true" }, emailRedirectTo: location.origin + location.pathname } });
+        const { data, error } = await sb.auth.signUp({ email, password, options: { data: { display_name, health_consent: "true" }, emailRedirectTo: WEB_URL || undefined } });
         if (error) throw error;
         if (!data.session) {
           openSheet(`<div style="text-align:center"><div class="empty-state"><div class="ic">${ic("check")}</div></div><h2>Revisa tu correo</h2><p class="muted">Te hemos enviado un enlace a <b>${esc(email)}</b> para confirmar tu cuenta. Después vuelve aquí e inicia sesión.</p><button class="btn primary block" data-act="close-sheet">Entendido</button></div>`);
@@ -845,6 +886,7 @@ function vHome() {
   const loading = !d.loaded;
   return `
   <div class="top">${logoHTML(34)}<button class="avatar" data-act="tab" data-tab="profile" aria-label="Perfil">${esc((name[0] || "N").toUpperCase())}</button></div>
+  ${installBanner()}
   <p class="eyebrow" style="margin:0 2px 4px">${esc(longDate(new Date()))}</p>
   <h1 style="margin:0 2px 18px">${hello}${name ? `, ${esc(name)}` : ""}</h1>
   ${S.mode === "local" ? `<div class="notice info" style="margin-bottom:14px">${ic("info", "s")}<span>Modo local: tus datos solo están en este dispositivo y el escáner con IA no está disponible. <button class="link" data-act="go-auth">Crear cuenta</button></span></div>` : ""}
@@ -1362,6 +1404,8 @@ function vProfile() {
       ${[["breakfast", "Desayuno", "08:30"], ["lunch", "Comida", "14:00"], ["snack", "Merienda", ""], ["dinner", "Cena", "21:00"]].map(([k, l, def]) => `<div><label class="f">${l}</label><input class="input" type="time" data-notif="${k}" value="${notif[k] ?? def}"></div>`).join("")}</div>
       <label class="check" style="margin-top:12px"><input type="checkbox" data-notif="water" ${notif.water ? "checked" : ""}> Recordarme beber agua cada 2 horas (9:00–21:00)</label>
       <p class="xs muted" style="margin:10px 0 0">Funcionan con la app abierta o en segundo plano. Las notificaciones push con la app cerrada están pendientes (requieren un servidor de envío).</p></div>` : ""}
+    ${IS_STANDALONE() ? "" : `<button class="li" data-act="install"><div class="ic">${ic("phone", "s")}</div><div class="t"><b>Instalar en el móvil</b><span>iPhone y Android, sin tiendas</span></div>${ic("right", "s")}</button>`}
+    <button class="li" data-act="share-app"><div class="ic">${ic("share", "s")}</div><div class="t"><b>Compartir NutriScan</b></div>${ic("right", "s")}</button>
     <button class="li" data-act="replay-tutorial"><div class="ic">${ic("info", "s")}</div><div class="t"><b>Ver tutorial</b></div>${ic("right", "s")}</button>
   </div>
 
@@ -1490,6 +1534,73 @@ async function deleteAccount() {
   } catch (e) { toast(e.code === "not_deployed" ? "Para eliminar la cuenta hace falta la función del servidor desplegada." : e.message, "err"); }
 }
 
+/* ════════════════ Instalación en el móvil ════════════════ */
+function installBanner() {
+  if (IS_STANDALONE() || !IS_MOBILE) return "";
+  if (Date.now() - store.get("ns_install_dismissed", 0) < 7 * 864e5) return "";
+  return `<div class="install-banner"><svg class="app-ic"><use href="#logo"/></svg>
+    <div class="t"><b>Instala NutriScan en tu ${IS_IOS ? "iPhone" : "móvil"}</b><span>Gratis y sin tiendas, en 10 segundos</span></div>
+    <button class="btn lime sm" data-act="install">Instalar</button>
+    <button class="icon-btn sm" style="border:0;background:transparent" data-act="install-dismiss" aria-label="Ahora no">${ic("close", "s")}</button></div>`;
+}
+const stepsHTML = (arr) => `<div class="install-steps">${arr.map((t, i) => `<div class="st"><span class="n">${i + 1}</span><p>${t}</p></div>`).join("")}</div>`;
+function loadScript(src) {
+  return new Promise((res, rej) => { const el = document.createElement("script"); el.src = src; el.onload = res; el.onerror = rej; document.head.appendChild(el); });
+}
+async function renderQR(el, url) {
+  if (!el) return;
+  try {
+    if (!window.qrcode) await loadScript("https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js");
+    const q = window.qrcode(0, "M"); q.addData(url); q.make();
+    el.innerHTML = q.createSvgTag({ cellSize: 4, margin: 0, scalable: true, alt: "Código QR para abrir NutriScan en el móvil" });
+  } catch { el.innerHTML = `<p class="xs muted" style="color:#333">No se pudo generar el QR.</p>`; }
+}
+function openInstall(tab) {
+  tab = tab || (IS_ANDROID ? "android" : "ios");
+  const apk = CFG.ANDROID_APK_URL;
+  let body = "";
+  if (tab === "ios") {
+    if (IS_IOS && IN_APP) body += `<div class="notice" style="margin-top:12px">${ic("info", "s")}<span>Estás dentro de otra app (Instagram, Google…). Toca <span class="kbd">${ic("dots")}</span> o la brújula y elige <b>Abrir en Safari</b>; después sigue estos pasos.</span></div>`;
+    body += stepsHTML([
+      `Toca <span class="kbd">${ic("share")} Compartir</span> ${/CriOS|EdgiOS|FxiOS/.test(UA) ? "junto a la barra de direcciones" : "en la barra de Safari (en iOS 26 está dentro del botón <span class='kbd'>···</span>)"}.`,
+      `Desliza hacia abajo y elige <span class="kbd">${ic("plus-sq")} Añadir a pantalla de inicio</span>.`,
+      `Activa <b>Abrir como app web</b> si aparece y pulsa <b>Añadir</b>. ¡Listo! NutriScan tendrá su propio icono.`,
+    ]);
+    body += `<p class="xs muted">iPhone con iOS 16.4 o posterior, desde Safari, Chrome o Edge. No hace falta App Store.</p>`;
+  } else {
+    if (installPrompt) body += `<button class="btn primary block" data-act="install-native" style="height:56px;margin-top:14px">${ic("download", "s")} Instalar ahora</button><p class="xs muted" style="text-align:center">Se añade a tu pantalla de inicio y al cajón de aplicaciones.</p>`;
+    else body += stepsHTML([
+      `Abre este enlace en <b>Chrome</b> (o Samsung Internet).`,
+      `Toca el menú <span class="kbd">${ic("dots")}</span> arriba a la derecha.`,
+      `Elige <span class="kbd">Instalar aplicación</span> o <span class="kbd">Añadir a pantalla de inicio</span> y confirma.`,
+    ]);
+    if (apk) body += `<div class="divider"></div><p class="small" style="margin:0 0 10px"><b>¿Prefieres el archivo APK?</b> Descárgalo, ábrelo y permite “instalar apps de este origen” cuando Android lo pida.</p><a class="btn ghost block" href="${esc(apk)}" rel="noopener">${ic("download", "s")} Descargar NutriScan.apk</a>`;
+  }
+  const qrBlock = !IS_MOBILE && WEB_URL ? `<div class="divider"></div><p class="small" style="text-align:center;margin:0"><b>¿Estás en el ordenador?</b> Escanea con la cámara del móvil:</p><div class="qr"></div>` : "";
+  openSheet(`<div class="row" style="gap:12px"><svg style="width:52px;height:52px;flex-shrink:0"><use href="#logo"/></svg><div><h2 style="margin:0">Instalar NutriScan</h2><p class="small muted" style="margin:0">Pantalla completa, icono propio y la cámara a un toque.</p></div></div>
+    <div class="seg" style="margin-top:16px"><button class="${tab === "ios" ? "on" : ""}" data-act="install" data-tab="ios">iPhone</button><button class="${tab === "android" ? "on" : ""}" data-act="install" data-tab="android">Android</button></div>
+    ${body}${qrBlock}
+    <button class="btn ghost block" style="margin-top:12px" data-act="share-app">${ic("share", "s")} Compartir enlace</button>`,
+    (sh) => qrBlock && renderQR($(".qr", sh), WEB_URL));
+}
+async function shareApp() {
+  const url = WEB_URL || CFG.APP_URL;
+  if (!url) return toast("Configura APP_URL en config.js para compartir el enlace.", "err");
+  const data = { title: "NutriScan", text: "NutriScan · Eat smart. Live better. Fotografía tu plato y conoce sus nutrientes.", url };
+  try {
+    if (navigator.share) await navigator.share(data);
+    else { await navigator.clipboard.writeText(url); toast("Enlace copiado"); }
+  } catch (e) { if (e?.name !== "AbortError") toast("No se pudo compartir.", "err"); }
+}
+function desktopQR() {
+  if (IS_MOBILE || IS_NATIVE || !WEB_URL || !matchMedia("(pointer:fine) and (min-width:1101px)").matches) return;
+  const el = document.createElement("div");
+  el.className = "desk-qr card";
+  el.innerHTML = `<p class="eyebrow" style="margin:0 0 6px">NutriScan es para el móvil</p><div class="qr"></div><p class="small muted" style="margin:6px 0 0">Escanéalo con la cámara de tu iPhone o Android e instálala.</p>`;
+  document.body.appendChild(el);
+  renderQR($(".qr", el), WEB_URL);
+}
+
 /* ════════════════ Recordatorios ════════════════ */
 function startReminders() {
   setInterval(async () => {
@@ -1524,7 +1635,7 @@ const ACT = {
   "auth-mode": (el) => { authMode = el.dataset.m; render("auth"); },
   "forgot": () => openSheet(`<h2>Recuperar contraseña</h2><p class="muted small">Te enviaremos un enlace para crear una nueva.</p><div class="field"><input class="input" id="fp-email" type="email" placeholder="tu@email.com" value="${esc($("#a-email")?.value || "")}"></div><button class="btn primary block" id="fp-go">Enviar enlace</button>`, (sh) => {
     $("#fp-go", sh).onclick = async () => {
-      const { error } = await sb.auth.resetPasswordForEmail($("#fp-email", sh).value.trim(), { redirectTo: location.origin + location.pathname });
+      const { error } = await sb.auth.resetPasswordForEmail($("#fp-email", sh).value.trim(), { redirectTo: WEB_URL || undefined });
       if (error) return toast(error.message, "err");
       closeSheet(); toast("Revisa tu correo");
     };
@@ -1606,6 +1717,17 @@ const ACT = {
   "export": () => exportData(),
   "logout": async () => { if (await confirmSheet("¿Cerrar sesión?", "Tus datos seguirán guardados en tu cuenta.", "Cerrar sesión", false)) await sb.auth.signOut(); },
   "delete-account": () => deleteAccount(),
+  "install": (el) => openInstall(el.dataset.tab),
+  "install-dismiss": (el) => { store.set("ns_install_dismissed", Date.now()); el.closest(".install-banner")?.remove(); },
+  "install-native": async () => {
+    if (!installPrompt) return;
+    closeSheet();
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice.catch(() => ({}));
+    installPrompt = null;
+    if (outcome === "dismissed") toast("Puedes instalarla cuando quieras desde Perfil.");
+  },
+  "share-app": () => shareApp(),
 };
 document.addEventListener("click", (e) => {
   const el = e.target.closest("[data-act]");
@@ -1645,7 +1767,10 @@ async function enterApp() {
   S.chat = store.get(chatKey(), []);
   await refreshAiStatus();
   if (!S.profile.onboarded) { S.onboardStep = 0; render("onboard"); return; }
-  S.tab = "home"; S.day.loaded = false; render("home"); loadDay();
+  const params = new URLSearchParams(location.search);
+  const startScan = params.get("action") === "scan";
+  if (params.has("action")) history.replaceState(null, "", location.pathname);
+  S.tab = startScan ? "scan" : "home"; S.day.loaded = false; render(S.tab); loadDay();
 }
 function startLocal() { S.mode = "local"; S.user = null; S.hist.loaded = S.nut.loaded = false; enterApp(); }
 let booted = false;
@@ -1686,7 +1811,8 @@ document.addEventListener("visibilitychange", () => {
     setTimeout(() => { sp.style.opacity = 0; setTimeout(() => sp.remove(), 500); }, Math.max(0, 1100 - (Date.now() - start)));
   });
   startReminders();
-  if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
+  if (!IS_NATIVE && "serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
+  desktopQR();
 })();
 </script>
 </body>

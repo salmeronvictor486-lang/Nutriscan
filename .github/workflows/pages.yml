@@ -1,0 +1,37 @@
+name: Publicar web (GitHub Pages)
+
+# Publica la app en https://<usuario>.github.io/<repo>/ para instalarla desde Safari o Chrome.
+# Requisito (una sola vez): Settings → Pages → Source: "GitHub Actions".
+on:
+  push:
+    branches: [main, master]
+    paths-ignore: ["**.md", "supabase/**", "android/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preparar sitio
+        run: |
+          mkdir _site
+          cp -r index.html config.js manifest.webmanifest sw.js icons _site/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

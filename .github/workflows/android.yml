@@ -1,0 +1,63 @@
+name: Android APK
+
+# Compila el APK de NutriScan en cada push y, en la rama principal (o al lanzarlo a mano),
+# lo publica siempre en la misma URL:
+#   https://github.com/<usuario>/<repo>/releases/download/android-latest/NutriScan.apk
+on:
+  push:
+    paths-ignore: ["**.md", "supabase/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Copiar la app web al proyecto Android
+        run: npm run build:web && npx cap sync android
+
+      - name: Compilar APK
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+
+      - name: Renombrar
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk NutriScan.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NutriScan-apk
+          path: NutriScan.apk
+          retention-days: 30
+
+      - name: Publicar en la release "android-latest"
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view android-latest >/dev/null 2>&1 || \
+            gh release create android-latest --title "NutriScan para Android" --target "$GITHUB_SHA" \
+              --notes "Descarga **NutriScan.apk** desde el móvil Android, ábrelo y permite instalar apps de este origen. Esta release se actualiza sola con cada versión."
+          gh release upload android-latest NutriScan.apk --clobber

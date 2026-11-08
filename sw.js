@@ -1,5 +1,5 @@
 // NutriScan service worker: app shell offline + notificaciones locales.
-const CACHE = "nutriscan-v1";
+const CACHE = "nutriscan-v2";
 const SHELL = ["./", "./index.html", "./config.js", "./manifest.webmanifest", "./icons/icon.svg", "./icons/icon-192.png"];
 
 self.addEventListener("install", (e) => {
