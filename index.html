@@ -1,0 +1,1693 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F3B2C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NutriScan">
+<meta name="description" content="NutriScan — Eat smart. Live better. Fotografía tu plato y conoce sus nutrientes aproximados con IA.">
+<title>NutriScan</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --bg:#F3F5EF; --bg-2:#E9EEE4; --surface:#FFFFFF; --surface-2:#F7F9F4;
+  --ink:#0E1A14; --ink-2:#2B3A31; --muted:#6B7A70; --line:#E2E8DD;
+  --forest:#0F3B2C; --forest-2:#1A5A42; --lime:#C8F169; --lime-2:#A9DD34; --on-lime:#0F3B2C;
+  --c-protein:#1F7A57; --c-carbs:#9CCB2C; --c-fat:#F0B13D; --c-fiber:#2FA39B; --c-water:#4C9BF0; --c-kcal:#0F3B2C;
+  --danger:#C8473A; --warn:#B7791F;
+  --hero-bg:#0F3B2C; --hero-ink:#F2F8EE; --hero-muted:#A8C2B3; --hero-track:rgba(255,255,255,.12);
+  --shadow:0 1px 2px rgba(15,59,44,.05), 0 8px 24px -12px rgba(15,59,44,.18);
+  --shadow-lg:0 24px 60px -20px rgba(15,59,44,.35);
+  --r:22px; --r-sm:14px;
+  --nav-h:76px;
+  --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+  --font-d:"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font:"Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A110D; --bg-2:#101A14; --surface:#131E18; --surface-2:#18251E;
+    --ink:#EAF2EA; --ink-2:#C9D6CC; --muted:#8A9B90; --line:#22322A;
+    --forest:#C8F169; --forest-2:#A9DD34; --on-lime:#0F3B2C;
+    --c-protein:#4CC28F; --c-kcal:#C8F169;
+    --hero-bg:#13261D; --hero-track:rgba(255,255,255,.08);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.6);
+    --shadow-lg:0 24px 60px -20px rgba(0,0,0,.7);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A110D; --bg-2:#101A14; --surface:#131E18; --surface-2:#18251E;
+  --ink:#EAF2EA; --ink-2:#C9D6CC; --muted:#8A9B90; --line:#22322A;
+  --forest:#C8F169; --forest-2:#A9DD34; --on-lime:#0F3B2C;
+  --c-protein:#4CC28F; --c-kcal:#C8F169;
+  --hero-bg:#13261D; --hero-track:rgba(255,255,255,.08);
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.6);
+  --shadow-lg:0 24px 60px -20px rgba(0,0,0,.7);
+  color-scheme: dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body{min-height:100dvh;overflow-x:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+img{display:block;max-width:100%}
+a{color:inherit}
+.app{max-width:480px;margin:0 auto;min-height:100dvh;position:relative;background:var(--bg)}
+@media (min-width:640px){
+  body{background:radial-gradient(1200px 600px at 20% -10%, color-mix(in srgb,var(--lime) 30%, transparent), transparent 60%), var(--bg-2)}
+  .app{box-shadow:0 0 0 1px var(--line), var(--shadow-lg);min-height:100dvh}
+}
+.view{padding:calc(14px + var(--safe-t)) 16px calc(var(--nav-h) + 36px + var(--safe-b));animation:fadeUp .35s cubic-bezier(.2,.7,.2,1)}
+.view.no-nav{padding-bottom:calc(28px + var(--safe-b))}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes scanline{0%{top:6%}50%{top:90%}100%{top:6%}}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes shimmer{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Tipografía */
+h1,h2,h3,.d{font-family:var(--font-d);letter-spacing:-.02em;margin:0}
+h1{font-size:28px;font-weight:700;line-height:1.1}
+h2{font-size:20px;font-weight:700}
+h3{font-size:16px;font-weight:700}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.xs{font-size:11.5px}
+.num{font-family:var(--font-d);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* Estructura */
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.stack>*+*{margin-top:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.card{background:var(--surface);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.card.flat{box-shadow:none}
+.section-title{display:flex;align-items:baseline;justify-content:space-between;margin:26px 2px 12px}
+.section-title h2{font-size:18px}
+.divider{height:1px;background:var(--line);margin:14px 0}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2)}
+.pill.lime{background:color-mix(in srgb,var(--lime) 35%, var(--surface));border-color:transparent;color:var(--on-lime)}
+.pill.ai{background:color-mix(in srgb,var(--c-fat) 20%, var(--surface));border-color:transparent;color:var(--ink)}
+.pill.db{background:color-mix(in srgb,var(--c-protein) 18%, var(--surface));border-color:transparent;color:var(--ink)}
+
+/* Botones */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 20px;border-radius:16px;font-weight:700;font-size:15px;transition:transform .15s, opacity .15s, background .2s}
+.btn:active{transform:scale(.97)}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.btn.primary{background:var(--forest);color:var(--bg)}
+:root[data-theme="dark"] .btn.primary{color:#0F3B2C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0F3B2C}}
+.btn.lime{background:var(--lime);color:var(--on-lime)}
+.btn.ghost{background:var(--surface-2);border:1px solid var(--line)}
+.btn.danger{background:color-mix(in srgb,var(--danger) 12%, var(--surface));color:var(--danger)}
+.btn.block{width:100%}
+.btn.sm{height:38px;padding:0 14px;border-radius:12px;font-size:13.5px}
+.icon-btn{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);flex-shrink:0}
+.icon-btn.sm{width:34px;height:34px;border-radius:11px}
+.link{color:var(--forest);font-weight:700;font-size:14px}
+svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+svg.i.s{width:18px;height:18px}
+
+/* Formularios */
+label.f{display:block;font-size:13px;font-weight:700;color:var(--ink-2);margin-bottom:6px}
+.input,select.input,textarea.input{width:100%;height:50px;padding:0 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);outline:none;transition:border .2s, box-shadow .2s;font-size:16px}
+textarea.input{height:auto;min-height:84px;padding:12px 14px;resize:vertical}
+.input:focus{border-color:var(--forest-2);box-shadow:0 0 0 4px color-mix(in srgb,var(--lime) 35%, transparent)}
+.field{margin-bottom:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);font-size:14px;font-weight:600;transition:all .15s}
+.chip.on{background:var(--forest);border-color:var(--forest);color:var(--bg)}
+:root[data-theme="dark"] .chip.on{color:#0F3B2C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chip.on{color:#0F3B2C}}
+.check{display:flex;gap:12px;align-items:flex-start;font-size:13.5px;color:var(--ink-2);cursor:pointer}
+.check input{width:20px;height:20px;accent-color:var(--forest-2);margin-top:1px;flex-shrink:0}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--line);padding:4px;border-radius:14px}
+.seg button{flex:1;height:36px;border-radius:10px;font-weight:700;font-size:13.5px;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.switch{position:relative;width:48px;height:28px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.switch span{position:absolute;inset:0;border-radius:99px;background:var(--line);transition:.2s}
+.switch span::after{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch input:checked+span{background:var(--forest-2)}
+.switch input:checked+span::after{transform:translateX(20px)}
+
+/* Logo */
+.logo{display:flex;align-items:center;gap:10px}
+.logo .mark{width:36px;height:36px}
+.logo b{font-family:var(--font-d);font-weight:800;font-size:20px;letter-spacing:-.03em}
+.logo b em{font-style:normal;color:var(--c-protein)}
+
+/* Cabecera */
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.avatar{width:42px;height:42px;border-radius:14px;background:var(--lime);color:var(--on-lime);display:grid;place-items:center;font-family:var(--font-d);font-weight:800;font-size:17px}
+.page-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.page-head h1{font-size:24px}
+
+/* Hero dashboard */
+.hero{background:var(--hero-bg);color:var(--hero-ink);border-radius:28px;padding:22px;position:relative;overflow:hidden;box-shadow:var(--shadow-lg)}
+.hero::before{content:"";position:absolute;width:260px;height:260px;right:-90px;top:-110px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--lime) 40%, transparent),transparent 65%)}
+.hero .muted{color:var(--hero-muted)}
+.ring-wrap{position:relative;width:148px;height:148px;flex-shrink:0}
+.ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring-wrap .track{stroke:var(--hero-track)}
+.ring-wrap .prog{stroke:var(--lime);transition:stroke-dashoffset 1.1s cubic-bezier(.2,.7,.2,1)}
+.ring-center{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring-center .big{font-size:34px;font-weight:800;line-height:1}
+.hero-stats{display:grid;gap:12px;flex:1;min-width:0}
+.hero-stats .k{font-size:12px;color:var(--hero-muted);font-weight:600}
+.hero-stats .v{font-size:20px;font-weight:700}
+.msg-card{display:flex;gap:12px;align-items:flex-start;margin-top:16px;padding:14px;border-radius:18px;background:rgba(255,255,255,.07);position:relative}
+.msg-card .spark{width:30px;height:30px;border-radius:10px;background:var(--lime);color:#0F3B2C;display:grid;place-items:center;flex-shrink:0}
+.msg-card p{margin:0;font-size:14px;line-height:1.45}
+
+/* CTA escanear */
+.scan-cta{margin-top:14px;width:100%;display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:24px;background:var(--lime);color:#0F3B2C;box-shadow:0 14px 30px -14px color-mix(in srgb,var(--lime-2) 90%, transparent);position:relative;overflow:hidden;text-align:left}
+.scan-cta .ic{width:52px;height:52px;border-radius:16px;background:#0F3B2C;color:var(--lime);display:grid;place-items:center}
+.scan-cta b{font-family:var(--font-d);font-size:19px;font-weight:800;letter-spacing:-.01em;display:block}
+.scan-cta span{font-size:13px;opacity:.8;font-weight:600}
+.scan-cta::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);background-size:200% 100%;animation:shimmer 3.2s infinite linear}
+
+/* Nutrientes */
+.nut{display:grid;gap:14px}
+.nut-row .top-line{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.nut-row .name{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.bar{height:9px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;width:0;transition:width 1s cubic-bezier(.2,.7,.2,1)}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
+.tile .k{font-size:12px;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}
+.tile .v{font-size:22px;font-weight:700;margin-top:4px}
+
+/* Agua */
+.water{display:flex;align-items:center;gap:14px}
+.glasses{display:flex;gap:5px;flex-wrap:wrap;flex:1}
+.glass{width:16px;height:22px;border-radius:3px 3px 6px 6px;border:1.5px solid color-mix(in srgb,var(--c-water) 55%, var(--line));position:relative;overflow:hidden}
+.glass.full::after{content:"";position:absolute;left:0;right:0;bottom:0;height:80%;background:var(--c-water);border-radius:0 0 4px 4px;animation:pop .4s}
+
+/* Comidas */
+.meal-slot{display:flex;align-items:center;gap:12px;padding:12px;border-radius:18px;background:var(--surface);border:1px solid var(--line);margin-bottom:10px;width:100%;text-align:left}
+.meal-slot .ph{width:56px;height:56px;border-radius:14px;background:var(--surface-2);display:grid;place-items:center;overflow:hidden;flex-shrink:0;color:var(--muted)}
+.meal-slot .ph img{width:100%;height:100%;object-fit:cover}
+.meal-slot .meta{flex:1;min-width:0}
+.meal-slot .meta b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meal-slot .kc{font-family:var(--font-d);font-weight:700;text-align:right}
+.meal-slot.empty{border-style:dashed;background:transparent;box-shadow:none}
+.meal-group-title{display:flex;align-items:center;gap:8px;margin:16px 4px 8px;font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+
+/* Navegación inferior */
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;z-index:40;padding:0 12px calc(10px + var(--safe-b))}
+.nav-inner{height:var(--nav-h);background:color-mix(in srgb,var(--surface) 88%, transparent);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1px solid var(--line);border-radius:26px;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;box-shadow:var(--shadow-lg)}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.02em;height:100%;justify-content:center}
+.nav button.on{color:var(--ink)}
+.nav button.on:not(.scan-btn) svg{stroke:var(--c-protein)}
+.ai-badge{background:#0F3B2C!important;color:#C8F169!important}
+.nav .scan-btn{position:relative}
+.nav .scan-btn .fab{width:64px;height:64px;border-radius:22px;background:var(--forest);color:var(--lime);display:grid;place-items:center;margin-top:-34px;box-shadow:0 14px 28px -10px rgba(15,59,44,.6), 0 0 0 6px var(--bg);transition:transform .2s}
+:root[data-theme="dark"] .nav .scan-btn .fab{background:var(--lime);color:#0F3B2C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .nav .scan-btn .fab{background:var(--lime);color:#0F3B2C}}
+.nav .scan-btn:active .fab{transform:scale(.92)}
+.nav .scan-btn .fab svg{width:28px;height:28px}
+
+/* Escáner */
+.finder{position:relative;aspect-ratio:1/.86;border-radius:30px;background:linear-gradient(160deg,var(--forest),#082519);overflow:hidden;display:grid;place-items:center;box-shadow:var(--shadow-lg)}
+:root[data-theme="dark"] .finder{background:linear-gradient(160deg,#173326,#08130D)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .finder{background:linear-gradient(160deg,#173326,#08130D)}}
+.finder img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.finder .corners{position:absolute;inset:22px;pointer-events:none}
+.finder .corners i{position:absolute;width:42px;height:42px;border-color:var(--lime);border-style:solid;border-width:0}
+.finder .corners i:nth-child(1){top:0;left:0;border-top-width:4px;border-left-width:4px;border-top-left-radius:16px}
+.finder .corners i:nth-child(2){top:0;right:0;border-top-width:4px;border-right-width:4px;border-top-right-radius:16px}
+.finder .corners i:nth-child(3){bottom:0;left:0;border-bottom-width:4px;border-left-width:4px;border-bottom-left-radius:16px}
+.finder .corners i:nth-child(4){bottom:0;right:0;border-bottom-width:4px;border-right-width:4px;border-bottom-right-radius:16px}
+.finder .line{position:absolute;left:8%;right:8%;height:3px;border-radius:3px;background:var(--lime);box-shadow:0 0 18px 4px color-mix(in srgb,var(--lime) 70%, transparent);animation:scanline 2.6s ease-in-out infinite}
+.finder .plate{width:58%;aspect-ratio:1;border-radius:50%;border:2px dashed rgba(200,241,105,.45);display:grid;place-items:center;color:rgba(200,241,105,.8)}
+.finder .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,30,20,.15),rgba(8,30,20,.65))}
+.finder .status{position:absolute;left:16px;right:16px;bottom:16px;background:rgba(8,26,18,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#F2F8EE;border-radius:18px;padding:14px 16px;display:flex;gap:12px;align-items:center}
+.spinner{width:22px;height:22px;border-radius:50%;border:3px solid rgba(200,241,105,.25);border-top-color:var(--lime);animation:spin .8s linear infinite;flex-shrink:0}
+.steps{display:grid;gap:4px;font-size:13px}
+.steps .s{opacity:.4;transition:opacity .3s}
+.steps .s.on{opacity:1;font-weight:700}
+.steps .s.done{opacity:.75}
+
+/* Resultados */
+.result-photo{border-radius:24px;overflow:hidden;aspect-ratio:4/3;background:var(--surface-2);position:relative}
+.result-photo img{width:100%;height:100%;object-fit:cover}
+.result-photo .badge{position:absolute;left:12px;top:12px}
+.notice{display:flex;gap:10px;padding:12px 14px;border-radius:16px;background:color-mix(in srgb,var(--c-fat) 14%, var(--surface));border:1px solid color-mix(in srgb,var(--c-fat) 35%, transparent);font-size:13px;color:var(--ink-2)}
+.notice.info{background:color-mix(in srgb,var(--c-water) 10%, var(--surface));border-color:color-mix(in srgb,var(--c-water) 30%, transparent)}
+.notice.ok{background:color-mix(in srgb,var(--lime) 22%, var(--surface));border-color:color-mix(in srgb,var(--lime-2) 40%, transparent)}
+.notice svg{flex-shrink:0;margin-top:1px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px;margin-bottom:10px}
+.item .name-in{border:0;background:transparent;font-weight:700;font-size:16px;padding:0;width:100%;outline:none;font-family:var(--font)}
+.item .name-in:focus{border-bottom:1.5px solid var(--forest-2)}
+.stepper{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:14px;height:42px;overflow:hidden;background:var(--surface-2)}
+.stepper button{width:40px;height:100%;display:grid;place-items:center}
+.stepper input{width:58px;text-align:center;border:0;background:transparent;font-weight:700;font-family:var(--font-d);font-size:16px;outline:none;-moz-appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none}
+.macro-mini{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);font-weight:600}
+.macro-mini b{color:var(--ink);font-family:var(--font-d)}
+.ntable{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+.ntable div{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ntable div span:last-child{font-family:var(--font-d);font-weight:700}
+.details{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.sticky-save{position:sticky;bottom:calc(10px + var(--safe-b));margin-top:18px;z-index:5}
+
+/* Hoja inferior / modal */
+.scrim{position:fixed;inset:0;background:rgba(6,18,12,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:60;opacity:0;transition:opacity .25s}
+.scrim.on{opacity:1}
+.sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,100%);width:100%;max-width:480px;max-height:92dvh;overflow:auto;background:var(--bg);border-radius:28px 28px 0 0;z-index:61;padding:10px 18px calc(22px + var(--safe-b));transition:transform .32s cubic-bezier(.2,.8,.2,1);box-shadow:var(--shadow-lg)}
+.sheet.on{transform:translate(-50%,0)}
+.sheet .grab{width:42px;height:5px;border-radius:9px;background:var(--line);margin:4px auto 14px}
+.sheet h2{margin-bottom:6px}
+
+/* Toast y éxito */
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 26px + var(--safe-b));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:14px;font-weight:600;font-size:14px;z-index:90;opacity:0;transition:all .3s;max-width:calc(100% - 32px);box-shadow:var(--shadow-lg);display:flex;gap:10px;align-items:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast.err{background:var(--danger);color:#fff}
+.success{position:fixed;inset:0;z-index:95;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 80%, transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:fadeUp .2s}
+.success .ok{width:96px;height:96px;border-radius:32px;background:var(--lime);display:grid;place-items:center;margin:0 auto 14px;animation:pop .5s cubic-bezier(.2,.8,.2,1);color:#0F3B2C}
+.success .ok svg{width:48px;height:48px;stroke-width:2.6}
+
+/* Splash, bienvenida, auth */
+.splash{position:fixed;inset:0;display:grid;place-items:center;background:#0F3B2C;z-index:100;transition:opacity .5s}
+.splash .mark{width:96px;height:96px;animation:pop .7s cubic-bezier(.2,.8,.2,1)}
+.splash p{color:#C8F169;font-family:var(--font-d);font-weight:700;letter-spacing:.02em;text-align:center;margin-top:16px;animation:fadeUp .8s .2s both}
+.splash .w{color:#fff;font-size:30px;font-weight:800;font-family:var(--font-d);letter-spacing:-.03em;text-align:center;animation:fadeUp .7s .1s both}
+.welcome{min-height:100dvh;display:flex;flex-direction:column;padding:calc(20px + var(--safe-t)) 22px calc(26px + var(--safe-b))}
+.welcome .art{flex:1;display:grid;place-items:center;min-height:300px}
+.welcome .art .blob{width:min(78vw,300px);aspect-ratio:1;border-radius:42% 58% 60% 40%/45% 45% 55% 55%;background:radial-gradient(circle at 30% 30%,var(--lime),var(--lime-2));display:grid;place-items:center;color:#0F3B2C;box-shadow:var(--shadow-lg);animation:pop .6s}
+.welcome .art .blob svg{width:42%;height:42%;stroke-width:1.4}
+.welcome h1{font-size:32px;margin-bottom:10px}
+.dots{display:flex;gap:6px;margin:22px 0}
+.dots i{width:8px;height:8px;border-radius:9px;background:var(--line);transition:all .3s}
+.dots i.on{width:26px;background:var(--forest)}
+.auth-hero{padding:calc(36px + var(--safe-t)) 22px 32px;background:#0F3B2C;color:#F2F8EE;border-radius:0 0 34px 34px;position:relative;overflow:hidden}
+.auth-hero::after{content:"";position:absolute;width:300px;height:300px;right:-120px;bottom:-160px;border-radius:50%;background:radial-gradient(circle,rgba(200,241,105,.45),transparent 65%)}
+.auth-hero .slogan{font-family:var(--font-d);font-size:34px;font-weight:800;line-height:1.02;letter-spacing:-.03em;margin:26px 0 8px}
+.auth-hero .slogan em{font-style:normal;color:#C8F169}
+
+/* Gráficos */
+.chart{width:100%;height:auto;display:block;overflow:visible}
+.chart text{font-family:var(--font);font-size:10px;fill:var(--muted);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.donut-wrap{display:flex;gap:18px;align-items:center}
+.donut-wrap svg{width:130px;height:130px;transform:rotate(-90deg);flex-shrink:0}
+
+/* Calendario */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal .dow{font-size:11px;font-weight:700;color:var(--muted);padding:4px 0}
+.cal button{aspect-ratio:1;border-radius:12px;font-weight:700;font-size:14px;position:relative;font-family:var(--font-d)}
+.cal button.other{opacity:.25}
+.cal button.today{box-shadow:inset 0 0 0 1.5px var(--forest-2)}
+.cal button.sel{background:var(--forest);color:var(--bg)}
+:root[data-theme="dark"] .cal button.sel{color:#0F3B2C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cal button.sel{color:#0F3B2C}}
+.cal button.has::after{content:"";position:absolute;bottom:6px;left:50%;width:5px;height:5px;border-radius:50%;background:var(--c-protein);transform:translateX(-50%)}
+.cal button.sel.has::after{background:var(--lime)}
+.cal button[disabled]{opacity:.2}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.gallery button{aspect-ratio:1;border-radius:14px;overflow:hidden;background:var(--surface-2);position:relative}
+.gallery img{width:100%;height:100%;object-fit:cover}
+.gallery span{position:absolute;left:6px;bottom:6px;background:rgba(0,0,0,.55);color:#fff;font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:7px}
+
+/* Chat */
+.chat{display:flex;flex-direction:column;min-height:calc(100dvh - 140px)}
+.msgs{flex:1;display:flex;flex-direction:column;gap:10px;padding-bottom:12px}
+.bubble{max-width:86%;padding:12px 14px;border-radius:20px;font-size:14.5px;line-height:1.5;animation:fadeUp .25s}
+.bubble.me{align-self:flex-end;background:var(--forest);color:var(--bg);border-bottom-right-radius:6px}
+:root[data-theme="dark"] .bubble.me{color:#0F3B2C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .bubble.me{color:#0F3B2C}}
+.bubble.bot{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:6px}
+.bubble.bot ul{margin:6px 0;padding-left:18px}
+.bubble.bot p{margin:0 0 6px}
+.bubble.bot p:last-child{margin:0}
+.typing{display:flex;gap:4px;padding:6px 2px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:pulse 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+.composer{position:sticky;bottom:calc(10px + var(--safe-b));display:flex;gap:8px;align-items:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:6px 6px 6px 14px;box-shadow:var(--shadow-lg)}
+.composer textarea{flex:1;border:0;outline:none;background:transparent;resize:none;max-height:120px;padding:10px 0;font-size:16px}
+.composer .send{width:44px;height:44px;border-radius:16px;background:var(--lime);color:#0F3B2C;display:grid;place-items:center}
+.suggest{display:flex;flex-direction:column;gap:8px}
+.suggest button{text-align:left;padding:12px 14px;border-radius:16px;background:var(--surface);border:1px solid var(--line);font-weight:600;font-size:14px;display:flex;gap:10px;align-items:center}
+
+/* Perfil */
+.list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.list .li{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.list .li:last-child{border-bottom:0}
+.list .li .ic{width:36px;height:36px;border-radius:11px;background:var(--surface-2);display:grid;place-items:center;flex-shrink:0}
+.list .li .t{flex:1;min-width:0}
+.list .li .t b{display:block;font-size:15px}
+.list .li .t span{font-size:12.5px;color:var(--muted)}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+.acc summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.acc summary::-webkit-details-marker{display:none}
+.acc[open] summary svg{transform:rotate(180deg)}
+.acc summary svg{transition:transform .2s}
+.acc p{margin:10px 0 0;font-size:14px;color:var(--ink-2)}
+.empty-state{text-align:center;padding:26px 14px;color:var(--muted)}
+.empty-state .ic{width:58px;height:58px;border-radius:20px;background:var(--surface-2);display:grid;place-items:center;margin:0 auto 10px}
+.skeleton{background:linear-gradient(90deg,var(--surface-2) 25%,var(--line) 50%,var(--surface-2) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:14px}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <main id="view"></main>
+  <nav class="nav hide" id="nav" aria-label="Navegación principal">
+    <div class="nav-inner">
+      <button data-act="tab" data-tab="home" aria-label="Inicio"><svg class="i"><use href="#i-home"/></svg>Inicio</button>
+      <button data-act="tab" data-tab="history" aria-label="Historial"><svg class="i"><use href="#i-cal"/></svg>Historial</button>
+      <button class="scan-btn" data-act="tab" data-tab="scan" aria-label="Escanear"><span class="fab"><svg class="i"><use href="#i-scan"/></svg></span>Escanear</button>
+      <button data-act="tab" data-tab="nutrition" aria-label="Nutrición"><svg class="i"><use href="#i-chart"/></svg>Nutrición</button>
+      <button data-act="tab" data-tab="profile" aria-label="Perfil"><svg class="i"><use href="#i-user"/></svg>Perfil</button>
+    </div>
+  </nav>
+</div>
+<input type="file" id="in-camera" accept="image/*" capture="environment" class="hide">
+<input type="file" id="in-gallery" accept="image/*" class="hide">
+
+<!-- Iconos -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M3 8V6a3 3 0 0 1 3-3h2M16 3h2a3 3 0 0 1 3 3v2M21 16v2a3 3 0 0 1-3 3h-2M8 21H6a3 3 0 0 1-3-3v-2"/><path d="M12 7.5c2.6 1.3 3.8 3.3 3.5 5.6-.3 1.9-1.7 3.3-3.5 3.6-1.8-.3-3.2-1.7-3.5-3.6-.3-2.3.9-4.3 3.5-5.6zM12 10v6.5"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6H7l1.5-2.5h7L17 6h1.5A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.8"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4.5-4.5L6 21"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3c3.5 4.2 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 2.5-6.8 6-11z"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21a6 6 0 0 0 6-6c0-4-3-6-4-10-2 2-3 4-3 6-1-1-1.5-2-1.5-3C7 10 6 12.5 6 15a6 6 0 0 0 6 6z"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M5 12h13M12 5l7 7-7 7"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15zM10 21h4"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3M15 8l2 2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-14 15-15-1 10-7 15-15 15zM5 19l8-8"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.7-4M4 4v4h4M4 13a8 8 0 0 0 14.7 4M20 20v-4h-4"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-bowl" viewBox="0 0 24 24"><path d="M3 11h18a9 9 0 0 1-18 0zM8 7c0-1.5 1-2 1-3.5M12 7c0-1.5 1-2 1-3.5M16 7c0-1.5 1-2 1-3.5"/></symbol>
+  <symbol id="logo" viewBox="0 0 512 512"><rect width="512" height="512" rx="116" fill="#0F3B2C"/><g fill="none" stroke="#C8F169" stroke-width="30" stroke-linecap="round"><path d="M120 176v-36a20 20 0 0 1 20-20h36M336 120h36a20 20 0 0 1 20 20v36M392 336v36a20 20 0 0 1-20 20h-36M176 392h-36a20 20 0 0 1-20-20v-36"/></g><path d="M256 150c58 28 86 74 80 128-5 44-38 78-80 84-42-6-75-40-80-84-6-54 22-100 80-128z" fill="#C8F169"/><path d="M256 196v156" stroke="#0F3B2C" stroke-width="14" stroke-linecap="round"/><path d="M256 250l-32-26M256 292l34-28" stroke="#0F3B2C" stroke-width="12" stroke-linecap="round"/><rect x="140" y="252" width="232" height="10" rx="5" fill="#fff" opacity=".9"/></symbol>
+</svg>
+
+<script>
+"use strict";
+/* ════════════════════════════════════════════════════════════
+   NutriScan · Eat smart. Live better.
+   ════════════════════════════════════════════════════════════ */
+const CFG = window.NUTRISCAN_CONFIG || {};
+const CLOUD_READY = !!(CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY && window.supabase);
+const sb = CLOUD_READY ? window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true } }) : null;
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const ic = (n, cls = "") => `<svg class="i ${cls}"><use href="#i-${n}"/></svg>`;
+const fmt = (n, d = 0) => (Number(n) || 0).toLocaleString("es-ES", { maximumFractionDigits: d, minimumFractionDigits: 0 });
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const store = {
+  get(k, d = null) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+
+/* ─── Nutrientes ─── */
+const NK = ["kcal", "protein", "carbs", "fat", "sat_fat", "fiber", "sugar", "sodium_mg"];
+const NL = { kcal: "Energía", protein: "Proteínas", carbs: "Carbohidratos", fat: "Grasas", sat_fat: "Grasas saturadas", fiber: "Fibra", sugar: "Azúcares", sodium_mg: "Sodio" };
+const NU = { kcal: "kcal", protein: "g", carbs: "g", fat: "g", sat_fat: "g", fiber: "g", sugar: "g", sodium_mg: "mg" };
+const NC = { protein: "var(--c-protein)", carbs: "var(--c-carbs)", fat: "var(--c-fat)", fiber: "var(--c-fiber)" };
+const MEAL_TYPES = { breakfast: "Desayuno", lunch: "Comida", snack: "Merienda", dinner: "Cena" };
+const MEAL_ORDER = ["breakfast", "lunch", "snack", "dinner"];
+const zero = () => Object.fromEntries(NK.map((k) => [k, 0]));
+const itemTotals = (it) => Object.fromEntries(NK.map((k) => [k, ((Number(it.per100g?.[k]) || 0) * (Number(it.grams) || 0)) / 100]));
+const sumItems = (items) => items.reduce((t, it) => { const x = itemTotals(it); NK.forEach((k) => (t[k] += x[k])); return t; }, zero());
+const sumMeals = (meals) => meals.reduce((t, m) => { NK.forEach((k) => (t[k] += Number(m[k]) || 0)); return t; }, zero());
+
+/* ─── Fechas ─── */
+const sod = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const dkey = (d) => { const x = new Date(d); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`; };
+const sameDay = (a, b) => dkey(a) === dkey(b);
+const timeStr = (d) => new Date(d).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+const longDate = (d) => new Date(d).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
+const toLocalInput = (d) => { const x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 16); };
+const autoMealType = (d = new Date()) => { const h = d.getHours() + d.getMinutes() / 60; return h < 11 ? "breakfast" : h < 16.5 ? "lunch" : h < 19.5 ? "snack" : "dinner"; };
+
+/* ─── Estado ─── */
+const S = {
+  mode: null, user: null, profile: null, ai: null,
+  tab: "home", view: "home",
+  day: { date: sod(new Date()), meals: [], water: [], loaded: false },
+  hist: { month: new Date(new Date().getFullYear(), new Date().getMonth(), 1), sel: sod(new Date()), meals: [], water: [], mode: "days", loaded: false },
+  nut: { period: "week", meals: [], water: [], loaded: false },
+  draft: null, chat: [], chatBusy: false, onboardStep: 0, welcomeStep: 0,
+};
+
+const DEFAULT_PROFILE = {
+  display_name: "", age: null, sex: null, weight_kg: null, height_cm: null, activity: "moderate", goal: "maintain",
+  diet_prefs: [], allergies: [], likes: "", dislikes: "", medical_flag: false,
+  kcal_goal: 2000, protein_goal: 75, carbs_goal: 250, fat_goal: 70, fiber_goal: 28, water_goal_ml: 2000,
+  onboarded: false, settings: {},
+};
+const isMinor = () => S.profile?.age != null && S.profile.age < 18;
+const isProtected = () => isMinor() || !!S.profile?.medical_flag;
+const aiReady = () => S.mode === "cloud" && !!S.ai?.configured;
+
+/* ════════════════ Capa de datos (Supabase o local) ════════════════ */
+const LOCAL_KEY = "ns_local_v1";
+const localDB = () => store.get(LOCAL_KEY, null) || { profile: { ...DEFAULT_PROFILE }, meals: [], water: [] };
+const saveLocal = (db) => { if (!store.set(LOCAL_KEY, db)) throw new Error("No queda espacio en este dispositivo. Borra registros antiguos o crea una cuenta."); };
+const signed = new Map();
+
+const DB = {
+  async getProfile() {
+    if (S.mode === "local") return { ...DEFAULT_PROFILE, ...localDB().profile };
+    let { data, error } = await sb.from("profiles").select("*").eq("id", S.user.id).maybeSingle();
+    if (error) throw error;
+    if (!data) {
+      const ins = await sb.from("profiles").insert({ id: S.user.id, display_name: S.user.email?.split("@")[0] }).select().single();
+      if (ins.error) throw ins.error;
+      data = ins.data;
+    }
+    return { ...DEFAULT_PROFILE, ...data, settings: data.settings || {} };
+  },
+  async saveProfile(patch) {
+    if (S.mode === "local") { const db = localDB(); db.profile = { ...db.profile, ...patch }; saveLocal(db); return db.profile; }
+    const { data, error } = await sb.from("profiles").update(patch).eq("id", S.user.id).select().single();
+    if (error) throw error;
+    return { ...DEFAULT_PROFILE, ...data };
+  },
+  async listMeals(from, to) {
+    if (S.mode === "local") {
+      return localDB().meals.filter((m) => new Date(m.eaten_at) >= from && new Date(m.eaten_at) < to)
+        .sort((a, b) => new Date(a.eaten_at) - new Date(b.eaten_at)).map((m) => ({ ...m, photo_url: m.photo_data || null }));
+    }
+    const { data, error } = await sb.from("meals").select("*").gte("eaten_at", from.toISOString()).lt("eaten_at", to.toISOString()).order("eaten_at");
+    if (error) throw error;
+    await this.signPhotos(data);
+    return data;
+  },
+  async listAllMeals() {
+    if (S.mode === "local") return localDB().meals;
+    const { data, error } = await sb.from("meals").select("*").order("eaten_at");
+    if (error) throw error;
+    return data;
+  },
+  async signPhotos(meals) {
+    const now = Date.now();
+    const need = [...new Set(meals.map((m) => m.photo_path).filter((p) => p && !(signed.get(p)?.exp > now + 60000)))];
+    if (need.length) {
+      const { data } = await sb.storage.from("meal-photos").createSignedUrls(need, 3600);
+      (data || []).forEach((d) => d.signedUrl && signed.set(d.path, { url: d.signedUrl, exp: now + 3500 * 1000 }));
+    }
+    meals.forEach((m) => (m.photo_url = m.photo_path ? signed.get(m.photo_path)?.url || null : null));
+  },
+  async saveMeal(meal, photoBlob) {
+    const row = {
+      meal_type: meal.meal_type, eaten_at: new Date(meal.eaten_at).toISOString(), title: meal.title,
+      items: meal.items, source: meal.source || "manual", notes: meal.notes || null, ...meal.totals,
+    };
+    NK.forEach((k) => (row[k] = Math.round((Number(row[k]) || 0) * 10) / 10));
+    if (S.mode === "local") {
+      const db = localDB();
+      if (photoBlob) row.photo_data = await blobToDataURL(await compressImage(photoBlob, 560, 0.7));
+      if (meal.id) { const i = db.meals.findIndex((m) => m.id === meal.id); if (i >= 0) db.meals[i] = { ...db.meals[i], ...row }; }
+      else db.meals.push({ id: uid(), created_at: new Date().toISOString(), ...row });
+      saveLocal(db);
+      return;
+    }
+    if (photoBlob) {
+      const path = `${S.user.id}/${uid()}.jpg`;
+      const up = await sb.storage.from("meal-photos").upload(path, photoBlob, { contentType: "image/jpeg", upsert: false });
+      if (up.error) throw new Error("No se pudo subir la foto: " + up.error.message);
+      if (meal.id && meal.photo_path) await sb.storage.from("meal-photos").remove([meal.photo_path]);
+      row.photo_path = path;
+    }
+    const q = meal.id ? sb.from("meals").update(row).eq("id", meal.id) : sb.from("meals").insert(row);
+    const { error } = await q;
+    if (error) throw error;
+  },
+  async deleteMeal(meal) {
+    if (S.mode === "local") { const db = localDB(); db.meals = db.meals.filter((m) => m.id !== meal.id); saveLocal(db); return; }
+    const { error } = await sb.from("meals").delete().eq("id", meal.id);
+    if (error) throw error;
+    if (meal.photo_path) await sb.storage.from("meal-photos").remove([meal.photo_path]);
+  },
+  async listWater(from, to) {
+    if (S.mode === "local") return localDB().water.filter((w) => new Date(w.logged_at) >= from && new Date(w.logged_at) < to);
+    const { data, error } = await sb.from("water_logs").select("*").gte("logged_at", from.toISOString()).lt("logged_at", to.toISOString()).order("logged_at");
+    if (error) throw error;
+    return data;
+  },
+  async addWater(ml, at) {
+    const logged_at = at.toISOString();
+    if (S.mode === "local") { const db = localDB(); db.water.push({ id: uid(), ml, logged_at }); saveLocal(db); return; }
+    const { error } = await sb.from("water_logs").insert({ ml, logged_at });
+    if (error) throw error;
+  },
+  async deleteWater(id) {
+    if (S.mode === "local") { const db = localDB(); db.water = db.water.filter((w) => w.id !== id); saveLocal(db); return; }
+    const { error } = await sb.from("water_logs").delete().eq("id", id);
+    if (error) throw error;
+  },
+};
+
+/* ─── IA (siempre a través de la Edge Function; ninguna clave en el navegador) ─── */
+async function ai(action, payload = {}) {
+  if (S.mode !== "cloud") throw Object.assign(new Error("La IA necesita una cuenta de NutriScan (modo nube)."), { code: "local_mode" });
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) throw Object.assign(new Error("Sesión caducada. Vuelve a iniciar sesión."), { code: "unauthorized" });
+  let r;
+  try {
+    r = await fetch(`${CFG.SUPABASE_URL}/functions/v1/${CFG.FUNCTION_NAME || "nutriscan-ai"}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}`, apikey: CFG.SUPABASE_ANON_KEY },
+      body: JSON.stringify({ action, ...payload }),
+    });
+  } catch {
+    throw Object.assign(new Error("Sin conexión con el servidor de IA. Comprueba tu conexión o que la función esté desplegada."), { code: "network" });
+  }
+  const body = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const msg = r.status === 404 ? "La función de IA aún no está desplegada en Supabase (pendiente de configurar)." : body.message || `Error ${r.status}`;
+    throw Object.assign(new Error(msg), { code: body.error || (r.status === 404 ? "not_deployed" : "http_" + r.status) });
+  }
+  return body;
+}
+async function refreshAiStatus() {
+  if (S.mode !== "cloud") { S.ai = { configured: false, reason: "local" }; return; }
+  try { S.ai = await ai("key_status"); }
+  catch (e) { S.ai = { configured: false, reason: e.code, message: e.message }; }
+}
+
+/* ─── Imagen ─── */
+async function compressImage(file, max = 1280, q = 0.82) {
+  let src;
+  try { src = await createImageBitmap(file, { imageOrientation: "from-image" }); }
+  catch {
+    src = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = URL.createObjectURL(file); });
+  }
+  const w = src.width, h = src.height, s = Math.min(1, max / Math.max(w, h));
+  const c = document.createElement("canvas"); c.width = Math.round(w * s); c.height = Math.round(h * s);
+  c.getContext("2d").drawImage(src, 0, 0, c.width, c.height);
+  return new Promise((res) => c.toBlob((b) => res(b), "image/jpeg", q));
+}
+const blobToDataURL = (b) => new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(b); });
+
+/* ════════════════ UI básica ════════════════ */
+const view = $("#view"), nav = $("#nav");
+function toast(msg, type = "") {
+  $(".toast")?.remove();
+  const t = document.createElement("div");
+  t.className = "toast " + type;
+  t.innerHTML = `${ic(type === "err" ? "info" : "check", "s")}<span>${esc(msg)}</span>`;
+  document.body.appendChild(t);
+  requestAnimationFrame(() => t.classList.add("on"));
+  setTimeout(() => { t.classList.remove("on"); setTimeout(() => t.remove(), 300); }, type === "err" ? 4600 : 2600);
+}
+function success(title, sub = "") {
+  const el = document.createElement("div");
+  el.className = "success";
+  el.innerHTML = `<div style="text-align:center"><div class="ok">${ic("check")}</div><h2>${esc(title)}</h2><p class="muted small">${esc(sub)}</p></div>`;
+  document.body.appendChild(el);
+  setTimeout(() => { el.style.opacity = 0; el.style.transition = "opacity .3s"; setTimeout(() => el.remove(), 300); }, 1300);
+}
+function openSheet(html, onMount) {
+  closeSheet(true);
+  const scrim = document.createElement("div"); scrim.className = "scrim"; scrim.dataset.act = "close-sheet";
+  const sh = document.createElement("div"); sh.className = "sheet"; sh.setAttribute("role", "dialog"); sh.setAttribute("aria-modal", "true");
+  sh.innerHTML = `<div class="grab"></div>${html}`;
+  document.body.append(scrim, sh);
+  requestAnimationFrame(() => { scrim.classList.add("on"); sh.classList.add("on"); });
+  onMount?.(sh);
+  return sh;
+}
+function closeSheet(instant) {
+  const sh = $(".sheet"), sc = $(".scrim");
+  if (!sh) return;
+  if (instant) { sh.remove(); sc?.remove(); return; }
+  sh.classList.remove("on"); sc?.classList.remove("on");
+  setTimeout(() => { sh.remove(); sc?.remove(); }, 300);
+}
+function confirmSheet(title, text, okLabel, danger = true) {
+  return new Promise((res) => {
+    openSheet(`<h2>${esc(title)}</h2><p class="muted">${esc(text)}</p>
+      <div class="grid2" style="margin-top:18px"><button class="btn ghost" id="cf-no">Cancelar</button><button class="btn ${danger ? "danger" : "primary"}" id="cf-ok">${esc(okLabel)}</button></div>`,
+      (sh) => { $("#cf-no", sh).onclick = () => { closeSheet(); res(false); }; $("#cf-ok", sh).onclick = () => { closeSheet(); res(true); }; });
+  });
+}
+const logoHTML = (size = 36) => `<div class="logo"><svg class="mark" style="width:${size}px;height:${size}px"><use href="#logo"/></svg><b>Nutri<em>Scan</em></b></div>`;
+function setNav(show) {
+  nav.classList.toggle("hide", !show);
+  $$(".nav button").forEach((b) => b.classList.toggle("on", b.dataset.tab === S.tab));
+}
+function render(v = S.view) {
+  S.view = v;
+  const screens = { setup: vSetup, welcome: vWelcome, auth: vAuth, onboard: vOnboard, home: vHome, history: vHistory, scan: vScan, analyzing: vAnalyzing, results: vResults, nutrition: vNutrition, profile: vProfile, chat: vChat };
+  const withNav = ["home", "history", "scan", "nutrition", "profile"].includes(v);
+  view.className = "view" + (withNav ? "" : " no-nav");
+  view.innerHTML = screens[v]();
+  setNav(withNav);
+  window.scrollTo(0, 0);
+  requestAnimationFrame(() => requestAnimationFrame(animateIn));
+  afterRender[v]?.();
+}
+const afterRender = {};
+function animateIn() {
+  $$("[data-w]").forEach((el) => (el.style.width = el.dataset.w + "%"));
+  $$("[data-off]").forEach((el) => (el.style.strokeDashoffset = el.dataset.off));
+}
+function rerenderKeepScroll() { const y = window.scrollY; render(); window.scrollTo(0, y); }
+
+/* ════════════════ Pantallas previas ════════════════ */
+function vSetup() {
+  return `<div style="padding-top:10px">${logoHTML()}
+  <h1 style="margin:28px 0 10px">Conecta tu base de datos</h1>
+  <p class="muted">NutriScan guarda cuentas, comidas y fotos en <b>Supabase</b>. Aún no está configurado en <code>config.js</code>, así que el registro en la nube está <b>pendiente</b>.</p>
+  <div class="card" style="margin:18px 0">
+    <ol style="margin:0;padding-left:18px;display:grid;gap:8px;font-size:14px">
+      <li>Crea un proyecto gratis en supabase.com (región UE).</li>
+      <li>Ejecuta <code>supabase/migrations/…_init.sql</code> en el SQL Editor.</li>
+      <li>Despliega la función <code>nutriscan-ai</code> y su secreto.</li>
+      <li>Rellena <code>SUPABASE_URL</code> y <code>SUPABASE_ANON_KEY</code> en <code>config.js</code>.</li>
+    </ol>
+    <p class="small muted" style="margin:12px 0 0">Los pasos detallados están en el README del proyecto.</p>
+  </div>
+  <button class="btn primary block" data-act="local-mode">Probar en este dispositivo (sin IA)</button>
+  <p class="xs muted" style="text-align:center;margin-top:10px">En modo local los datos solo se guardan en este navegador y el escáner con IA no está disponible.</p></div>`;
+}
+
+const WELCOME = [
+  { icon: "camera", t: "Fotografía tu plato", d: "Un toque y NutriScan identifica los alimentos de tu comida." },
+  { icon: "spark", t: "IA que estima, tú decides", d: "Calcula porciones y nutrientes aproximados. Puedes corregir todo antes de guardar." },
+  { icon: "leaf", t: "Tu día, sin juicios", d: "Un resumen claro de energía, macros, fibra y agua para conocerte mejor, no para restringirte." },
+  { icon: "shield", t: "Tus datos son tuyos", d: "Fotos privadas, base de datos individual y claves cifradas en el servidor." },
+];
+function vWelcome() {
+  const i = S.welcomeStep, w = WELCOME[i];
+  return `<div class="welcome">
+    <div class="row between">${logoHTML(30)}<button class="link" data-act="welcome-skip">Saltar</button></div>
+    <div class="art"><div class="blob">${ic(w.icon)}</div></div>
+    <div><p class="eyebrow">${i + 1} / ${WELCOME.length}</p><h1>${w.t}</h1><p class="muted" style="font-size:17px">${w.d}</p>
+    <div class="dots">${WELCOME.map((_, j) => `<i class="${j === i ? "on" : ""}"></i>`).join("")}</div>
+    <button class="btn primary block" data-act="welcome-next">${i < WELCOME.length - 1 ? "Siguiente" : "Empezar"} ${ic("right", "s")}</button></div></div>`;
+}
+
+let authMode = "login";
+function vAuth() {
+  const reg = authMode === "register";
+  return `<div style="margin:calc(-14px - var(--safe-t)) -16px 0">
+    <div class="auth-hero"><div class="logo"><svg class="mark" style="width:40px;height:40px"><use href="#logo"/></svg><b style="color:#fff">Nutri<em style="color:#C8F169">Scan</em></b></div>
+      <div class="slogan">Eat smart.<br><em>Live better.</em></div><p style="margin:0;color:#A8C2B3">Tu alimentación, analizada inteligentemente.</p></div></div>
+  <div style="padding-top:22px">
+    <div class="seg" style="margin-bottom:20px"><button class="${!reg ? "on" : ""}" data-act="auth-mode" data-m="login">Iniciar sesión</button><button class="${reg ? "on" : ""}" data-act="auth-mode" data-m="register">Crear cuenta</button></div>
+    <form id="auth-form" autocomplete="on">
+      ${reg ? `<div class="field"><label class="f" for="a-name">Nombre o alias</label><input class="input" id="a-name" autocomplete="nickname" maxlength="40" placeholder="¿Cómo te llamamos?"></div>` : ""}
+      <div class="field"><label class="f" for="a-email">Email</label><input class="input" id="a-email" type="email" autocomplete="email" required placeholder="tu@email.com"></div>
+      <div class="field"><label class="f" for="a-pass">Contraseña</label><input class="input" id="a-pass" type="password" autocomplete="${reg ? "new-password" : "current-password"}" minlength="8" required placeholder="Mínimo 8 caracteres"></div>
+      ${reg ? `<div class="stack" style="margin:16px 0">
+        <label class="check"><input type="checkbox" id="a-age" required> Tengo 14 años o más.</label>
+        <label class="check"><input type="checkbox" id="a-health" required> Consiento expresamente que NutriScan trate mis datos de alimentación (datos relacionados con la salud) para ofrecerme el servicio.</label>
+        <label class="check"><input type="checkbox" id="a-terms" required> He leído la <a href="#" data-act="privacy">política de privacidad</a>.</label></div>` : ""}
+      <button class="btn primary block" type="submit" id="a-submit">${reg ? "Crear mi cuenta" : "Entrar"}</button>
+    </form>
+    ${!reg ? `<p style="text-align:center;margin:14px 0"><button class="link" data-act="forgot">¿Has olvidado la contraseña?</button></p>` : ""}
+    <div class="divider"></div>
+    <button class="btn ghost block" data-act="local-mode">Probar sin cuenta (solo este dispositivo)</button>
+  </div>`;
+}
+afterRender.auth = () => {
+  $("#auth-form").onsubmit = async (e) => {
+    e.preventDefault();
+    const email = $("#a-email").value.trim(), password = $("#a-pass").value, btn = $("#a-submit");
+    btn.disabled = true; btn.innerHTML = `<span class="spinner" style="border-color:rgba(255,255,255,.3);border-top-color:currentColor"></span>`;
+    try {
+      if (authMode === "register") {
+        const display_name = $("#a-name").value.trim();
+        const { data, error } = await sb.auth.signUp({ email, password, options: { data: { display_name, health_consent: "true" }, emailRedirectTo: location.origin + location.pathname } });
+        if (error) throw error;
+        if (!data.session) {
+          openSheet(`<div style="text-align:center"><div class="empty-state"><div class="ic">${ic("check")}</div></div><h2>Revisa tu correo</h2><p class="muted">Te hemos enviado un enlace a <b>${esc(email)}</b> para confirmar tu cuenta. Después vuelve aquí e inicia sesión.</p><button class="btn primary block" data-act="close-sheet">Entendido</button></div>`);
+          authMode = "login"; render("auth");
+        }
+      } else {
+        const { error } = await sb.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+      }
+    } catch (err) {
+      const m = String(err.message || err);
+      toast(/Invalid login/i.test(m) ? "Email o contraseña incorrectos." : /registered/i.test(m) ? "Ese email ya tiene cuenta. Inicia sesión." : /Email not confirmed/i.test(m) ? "Confirma tu email antes de entrar." : m, "err");
+      btn.disabled = false; btn.textContent = authMode === "register" ? "Crear mi cuenta" : "Entrar";
+    }
+  };
+};
+
+/* Onboarding de perfil */
+const DIETS = ["Omnívora", "Mediterránea", "Vegetariana", "Vegana", "Pescetariana", "Flexitariana", "Halal", "Kosher"];
+const ALLERGENS = ["Gluten", "Lactosa", "Leche", "Huevo", "Frutos secos", "Cacahuete", "Soja", "Pescado", "Marisco", "Moluscos", "Sésamo", "Mostaza", "Apio", "Sulfitos", "Altramuces"];
+const ACTIVITY = { sedentary: "Sedentaria", light: "Ligera", moderate: "Moderada", active: "Activa", very_active: "Muy activa" };
+const GOALS = { health: "Comer más variado", maintain: "Mantener mi peso", gain: "Ganar masa muscular", lose_gradual: "Perder peso de forma gradual" };
+
+function vOnboard() {
+  const p = S.profile, st = S.onboardStep, total = S.mode === "cloud" ? 4 : 3;
+  let body = "";
+  if (st === 0) body = `<h1>Hola${p.display_name ? ", " + esc(p.display_name) : ""} 👋</h1><p class="muted">Cuéntanos un poco sobre ti para personalizar NutriScan.</p>
+    <div class="field" style="margin-top:18px"><label class="f">Nombre o alias</label><input class="input" id="o-name" maxlength="40" value="${esc(p.display_name)}"></div>
+    <div class="field"><label class="f">Edad</label><input class="input" id="o-age" type="number" inputmode="numeric" min="14" max="120" value="${p.age ?? ""}" placeholder="Años"></div>
+    <label class="check"><input type="checkbox" id="o-med" ${p.medical_flag ? "checked" : ""}> Tengo una condición médica, embarazo o necesidades nutricionales especiales.</label>`;
+  if (st === 1) body = `<h1>Tu ritmo</h1><p class="muted">Para orientar tus objetivos diarios. Todo es opcional y editable.</p>
+    <div class="field" style="margin-top:18px"><label class="f">Nivel de actividad</label><div class="chips" data-group="activity">${Object.entries(ACTIVITY).map(([k, v]) => `<button class="chip ${p.activity === k ? "on" : ""}" data-act="chip1" data-v="${k}">${v}</button>`).join("")}</div></div>
+    <div class="field"><label class="f">Objetivo</label><div class="chips" data-group="goal">${Object.entries(GOALS).map(([k, v]) => `<button class="chip ${p.goal === k ? "on" : ""}" data-act="chip1" data-v="${k}" ${k === "lose_gradual" && isProtected() ? "disabled style='opacity:.35'" : ""}>${v}</button>`).join("")}</div>
+    ${isProtected() ? `<p class="xs muted" style="margin-top:8px">Por tu edad o situación no proponemos objetivos de pérdida de peso automáticos. Un dietista-nutricionista puede ayudarte a definirlos.</p>` : ""}</div>`;
+  if (st === 2) body = `<h1>Lo que comes</h1><p class="muted">El asistente lo tendrá en cuenta y nunca te sugerirá tus alérgenos.</p>
+    <div class="field" style="margin-top:18px"><label class="f">Preferencias</label><div class="chips" data-group="diet_prefs">${DIETS.map((d) => `<button class="chip ${p.diet_prefs?.includes(d) ? "on" : ""}" data-act="chipN" data-v="${d}">${d}</button>`).join("")}</div></div>
+    <div class="field"><label class="f">Alergias e intolerancias</label><div class="chips" data-group="allergies">${ALLERGENS.map((d) => `<button class="chip ${p.allergies?.includes(d) ? "on" : ""}" data-act="chipN" data-v="${d}">${d}</button>`).join("")}</div></div>`;
+  if (st === 3) body = claudeConnectHTML(true);
+  return `<div class="row between" style="margin-bottom:22px">${logoHTML(30)}<span class="pill">${st + 1} / ${total}</span></div>${body}
+  <div class="grid2" style="margin-top:24px">${st > 0 ? `<button class="btn ghost" data-act="ob-prev">Atrás</button>` : "<span></span>"}
+  <button class="btn primary" data-act="ob-next">${st === total - 1 ? "Empezar" : "Continuar"}</button></div>`;
+}
+afterRender.onboard = () => afterRender.claude?.();
+
+/* ════════════════ INICIO ════════════════ */
+function positiveMessage(t, meals, waterMl) {
+  const p = S.profile, n = meals.length;
+  const foods = new Set(meals.flatMap((m) => (m.items || []).map((i) => i.name?.toLowerCase())));
+  if (!n && !waterMl) return "Un nuevo día para cuidarte. Cuando quieras, escanea tu primera comida y empezamos.";
+  const bits = [];
+  if (n) bits.push(`Llevas ${n} ${n === 1 ? "comida registrada" : "comidas registradas"}`);
+  if (foods.size >= 6) bits.push(`con ${foods.size} alimentos distintos: ¡buena variedad!`);
+  else if (foods.size >= 3) bits.push(`con ${foods.size} alimentos distintos`);
+  let s = bits.join(" ") + (bits.length ? ". " : "");
+  if (t.fiber >= p.fiber_goal * 0.7) s += "Tu aporte de fibra va genial. ";
+  else if (t.protein >= p.protein_goal * 0.7) s += "Buen aporte de proteínas hoy. ";
+  if (waterMl >= p.water_goal_ml) s += "Y has cumplido tu hidratación 💧";
+  else if (waterMl > 0) s += n ? `Y ${fmt(waterMl / 1000, 1)} L de agua.` : `Llevas ${fmt(waterMl / 1000, 1)} L de agua.`;
+  else s += "Recuerda beber agua cuando te apetezca.";
+  return s.trim();
+}
+function ringHTML(value, goal, label) {
+  const r = 60, c = 2 * Math.PI * r, pct = goal ? clamp(value / goal, 0, 1) : 0;
+  return `<div class="ring-wrap"><svg viewBox="0 0 140 140"><circle class="track" cx="70" cy="70" r="${r}" fill="none" stroke-width="12"/>
+    <circle class="prog" cx="70" cy="70" r="${r}" fill="none" stroke-width="12" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c}" data-off="${c * (1 - pct)}"/></svg>
+    <div class="ring-center"><div><div class="big num">${fmt(value)}</div><div class="xs muted">${label}</div></div></div></div>`;
+}
+function nutBar(key, val, goal) {
+  const pct = goal ? clamp((val / goal) * 100, 0, 100) : 0;
+  return `<div class="nut-row"><div class="top-line"><span class="name"><i class="dot" style="background:${NC[key]}"></i>${NL[key]}</span>
+    <span class="small"><b class="num" style="font-size:15px">${fmt(val)}</b><span class="muted"> / ${fmt(goal)} g</span></span></div>
+    <div class="bar"><i style="background:${NC[key]}" data-w="${pct}"></i></div></div>`;
+}
+function mealSlotHTML(m) {
+  return `<button class="meal-slot" data-act="meal" data-id="${m.id}">
+    <div class="ph">${m.photo_url ? `<img src="${esc(m.photo_url)}" alt="" loading="lazy">` : ic("bowl")}</div>
+    <div class="meta"><b>${esc(m.title || "Comida")}</b><span class="small muted">${MEAL_TYPES[m.meal_type]} · ${timeStr(m.eaten_at)} · ${(m.items || []).length} alimentos</span></div>
+    <div class="kc">${fmt(m.kcal)}<div class="xs muted" style="font-family:var(--font)">kcal</div></div></button>`;
+}
+function vHome() {
+  const p = S.profile, d = S.day, t = sumMeals(d.meals), waterMl = d.water.reduce((a, w) => a + w.ml, 0);
+  const name = p.display_name || "";
+  const h = new Date().getHours(), hello = h < 6 ? "Buenas noches" : h < 13 ? "Buenos días" : h < 21 ? "Buenas tardes" : "Buenas noches";
+  const remaining = Math.round(p.kcal_goal - t.kcal);
+  const glasses = Math.max(4, Math.round(p.water_goal_ml / 250)), filled = Math.floor(waterMl / 250);
+  const loading = !d.loaded;
+  return `
+  <div class="top">${logoHTML(34)}<button class="avatar" data-act="tab" data-tab="profile" aria-label="Perfil">${esc((name[0] || "N").toUpperCase())}</button></div>
+  <p class="eyebrow" style="margin:0 2px 4px">${esc(longDate(new Date()))}</p>
+  <h1 style="margin:0 2px 18px">${hello}${name ? `, ${esc(name)}` : ""}</h1>
+  ${S.mode === "local" ? `<div class="notice info" style="margin-bottom:14px">${ic("info", "s")}<span>Modo local: tus datos solo están en este dispositivo y el escáner con IA no está disponible. <button class="link" data-act="go-auth">Crear cuenta</button></span></div>` : ""}
+  <section class="hero">
+    <div class="row" style="gap:18px;align-items:center;position:relative">
+      ${ringHTML(t.kcal, p.kcal_goal, "kcal hoy")}
+      <div class="hero-stats">
+        <div><div class="k">Objetivo orientativo</div><div class="v num">${fmt(p.kcal_goal)} <span class="small muted">kcal</span></div></div>
+        ${isMinor() ? "" : `<div><div class="k">${remaining >= 0 ? "Margen orientativo" : "Por encima del objetivo orientativo"}</div><div class="v num">${fmt(Math.abs(remaining))} <span class="small muted">kcal</span></div></div>`}
+        <div class="row" style="gap:16px"><div><div class="k">Comidas</div><div class="v num">${d.meals.length}</div></div><div><div class="k">Agua</div><div class="v num">${fmt(waterMl / 1000, 1)} <span class="small muted">L</span></div></div></div>
+      </div>
+    </div>
+    <div class="msg-card"><div class="spark">${ic("spark", "s")}</div><p>${loading ? "Cargando tu resumen…" : esc(positiveMessage(t, d.meals, waterMl))}</p></div>
+  </section>
+
+  <button class="scan-cta" data-act="tab" data-tab="scan"><div class="ic">${ic("camera")}</div><div><b>ESCANEAR MI PLATO</b><span>Foto → nutrientes aproximados en segundos</span></div></button>
+
+  <div class="section-title"><h2>Nutrientes de hoy</h2><button class="link small" data-act="tab" data-tab="nutrition">Ver más</button></div>
+  <div class="card nut">${["protein", "carbs", "fat", "fiber"].map((k) => nutBar(k, t[k], p[k + "_goal"])).join("")}</div>
+
+  <div class="section-title"><h2>Hidratación</h2><span class="small muted">${fmt(waterMl)} / ${fmt(p.water_goal_ml)} ml</span></div>
+  <div class="card"><div class="water">
+    <div class="glasses" aria-label="${filled} vasos">${Array.from({ length: glasses }, (_, i) => `<i class="glass ${i < filled ? "full" : ""}"></i>`).join("")}</div>
+    <button class="icon-btn sm" data-act="water-undo" aria-label="Quitar último">${ic("minus", "s")}</button>
+    <button class="btn lime sm" data-act="water-add" data-ml="250">${ic("drop", "s")} +250 ml</button>
+  </div></div>
+
+  <div class="section-title"><h2>Comidas de hoy</h2><span class="pill">${d.meals.length} ${d.meals.length === 1 ? "registrada" : "registradas"}</span></div>
+  ${loading ? `<div class="skeleton" style="height:80px;margin-bottom:10px"></div><div class="skeleton" style="height:80px"></div>` :
+    MEAL_ORDER.map((mt) => {
+      const ms = d.meals.filter((m) => m.meal_type === mt);
+      return `<div class="meal-group-title">${MEAL_TYPES[mt]}</div>` + (ms.length ? ms.map(mealSlotHTML).join("") :
+        `<button class="meal-slot empty" data-act="scan-for" data-mt="${mt}"><div class="ph">${ic("plus")}</div><div class="meta"><b style="color:var(--muted)">Añadir ${MEAL_TYPES[mt].toLowerCase()}</b></div></button>`);
+    }).join("")}
+
+  <div class="section-title"><h2>NutriScan AI</h2></div>
+  <button class="card row" style="width:100%;text-align:left" data-act="open-chat">
+    <div class="avatar ai-badge">${ic("spark", "s")}</div>
+    <div style="flex:1"><b>Pregúntame lo que quieras</b><div class="small muted">Ideas de comidas, nutrientes, recetas con lo que tienes…</div></div>${ic("right", "s")}
+  </button>`;
+}
+
+async function loadDay(date = new Date()) {
+  const from = sod(date), to = addDays(from, 1);
+  try {
+    const [meals, water] = await Promise.all([DB.listMeals(from, to), DB.listWater(from, to)]);
+    S.day = { date: from, meals, water, loaded: true };
+  } catch (e) { S.day.loaded = true; toast("No se pudieron cargar tus datos: " + e.message, "err"); }
+  if (S.view === "home") rerenderKeepScroll();
+}
+function invalidate() { S.hist.loaded = false; S.nut.loaded = false; }
+
+/* ════════════════ ESCANEAR ════════════════ */
+function vScan() {
+  const ready = aiReady();
+  let pending = "";
+  if (!ready) {
+    const why = S.mode === "local" ? "La IA necesita una cuenta de NutriScan: en modo local no hay servidor seguro donde guardar tu clave."
+      : S.ai?.reason === "not_deployed" || S.ai?.reason === "network" ? S.ai.message
+      : S.ai?.reason === "server_not_configured" ? "El servidor de IA está desplegado pero falta su secreto de cifrado."
+      : "Aún no has conectado tu cuenta de Claude.";
+    pending = `<div class="notice" style="margin-bottom:14px">${ic("info", "s")}<div><b>Análisis con IA pendiente.</b> ${esc(why)} No mostraremos resultados simulados.
+      ${S.mode === "cloud" ? `<div style="margin-top:8px"><button class="btn sm primary" data-act="claude-sheet">${ic("key", "s")} Conectar Claude</button></div>` : ""}</div></div>`;
+  }
+  return `<div class="page-head"><div><p class="eyebrow">Función estrella</p><h1>Escanear mi plato</h1></div></div>
+  ${pending}
+  <div class="finder"><div class="plate">${ic("bowl")}</div><div class="corners"><i></i><i></i><i></i><i></i></div>${ready ? `<div class="line"></div>` : ""}</div>
+  <div class="grid2" style="margin-top:16px">
+    <button class="btn primary" data-act="pick" data-src="camera">${ic("camera", "s")} Hacer foto</button>
+    <button class="btn ghost" data-act="pick" data-src="gallery">${ic("image", "s")} Galería</button>
+  </div>
+  <button class="btn ghost block" style="margin-top:10px" data-act="manual">${ic("edit", "s")} Registrar sin foto</button>
+  <div class="card flat" style="margin-top:18px"><h3 style="margin-bottom:8px">Para una mejor estimación</h3>
+    <ul class="small muted" style="margin:0;padding-left:18px;display:grid;gap:4px">
+      <li>Foto cenital (desde arriba) y con buena luz.</li><li>Que se vea el plato entero y, si puedes, un cubierto como referencia.</li>
+      <li>Los valores son <b>aproximados</b>: aceites y salsas ocultas no se ven en una foto.</li></ul></div>`;
+}
+async function onPhoto(file) {
+  if (!file) return;
+  if (!/^image\//.test(file.type)) return toast("Ese archivo no es una imagen.", "err");
+  let blob;
+  try { blob = await compressImage(file); } catch { return toast("No se pudo leer la imagen. Prueba con otra.", "err"); }
+  S.draft = { id: null, photoBlob: blob, photo_url: URL.createObjectURL(blob), photo_path: null, items: [], meal_type: S.pendingMealType || autoMealType(), eaten_at: new Date(), title: "", notes: "", source: "manual", fresh: true };
+  S.pendingMealType = null;
+  if (aiReady()) runAnalysis(); else { render("results"); toast("IA pendiente: añade los alimentos manualmente.", ""); }
+}
+const STEPS = ["Identificando alimentos", "Estimando porciones", "Calculando nutrientes", "Consultando base de datos"];
+let stepTimer;
+function vAnalyzing() {
+  return `<div class="page-head"><button class="icon-btn" data-act="cancel-analysis" aria-label="Cancelar">${ic("close", "s")}</button><h1>Analizando…</h1></div>
+  <div class="finder"><img src="${esc(S.draft.photo_url)}" alt="Tu plato"><div class="veil"></div><div class="corners"><i></i><i></i><i></i><i></i></div><div class="line"></div>
+    <div class="status"><span class="spinner"></span><div class="steps">${STEPS.map((s, i) => `<div class="s ${i === 0 ? "on" : ""}" data-step="${i}">${s}</div>`).join("")}</div></div></div>
+  <p class="small muted" style="text-align:center;margin-top:16px">Suele tardar entre 10 y 30 segundos. Los resultados serán estimaciones aproximadas.</p>`;
+}
+afterRender.analyzing = () => {
+  let i = 0; clearInterval(stepTimer);
+  stepTimer = setInterval(() => {
+    i = Math.min(i + 1, STEPS.length - 1);
+    $$("[data-step]").forEach((el) => { const k = +el.dataset.step; el.className = "s " + (k < i ? "done" : k === i ? "on" : ""); });
+  }, 4200);
+};
+let analysisToken = 0;
+async function runAnalysis() {
+  const token = ++analysisToken;
+  render("analyzing");
+  try {
+    const dataUrl = await blobToDataURL(S.draft.photoBlob);
+    const res = await ai("analyze", { image_base64: dataUrl.split(",")[1], media_type: "image/jpeg" });
+    if (token !== analysisToken) return;
+    clearInterval(stepTimer);
+    if (!res.is_food) {
+      S.draft.notes = res.notes;
+      render("results");
+      toast("No hemos detectado comida en la foto. Puedes añadir alimentos a mano.", "err");
+      return;
+    }
+    Object.assign(S.draft, { items: res.items, title: res.dish_name || "", notes: res.notes || "", source: "ai" });
+    render("results");
+  } catch (e) {
+    if (token !== analysisToken) return;
+    clearInterval(stepTimer);
+    render("results");
+    openSheet(`<h2>No se pudo analizar</h2><p class="muted">${esc(e.message)}</p>
+      <div class="grid2" style="margin-top:16px"><button class="btn ghost" data-act="close-sheet">Añadir a mano</button><button class="btn primary" data-act="retry-analysis">${ic("refresh", "s")} Reintentar</button></div>
+      ${e.code === "no_key" || e.code === "bad_key" ? `<button class="btn lime block" style="margin-top:10px" data-act="claude-sheet">${ic("key", "s")} Conectar Claude</button>` : ""}`);
+    if (e.code === "no_key" || e.code === "bad_key") refreshAiStatus();
+  }
+}
+
+/* ════════════════ RESULTADOS / EDICIÓN ════════════════ */
+function vResults() {
+  const d = S.draft, t = sumItems(d.items);
+  return `<div class="page-head"><button class="icon-btn" data-act="discard" aria-label="Volver">${ic("back", "s")}</button><div style="flex:1"><p class="eyebrow">${d.id ? "Editar registro" : d.source === "ai" ? "Resultado del análisis" : "Registro manual"}</p><h1>${d.id ? "Editar comida" : "Tu plato"}</h1></div></div>
+  ${d.photo_url ? `<div class="result-photo"><img src="${esc(d.photo_url)}" alt="Foto del plato">${d.source === "ai" ? `<span class="pill lime badge">${ic("spark", "s")} Analizado con IA</span>` : ""}</div>`
+    : `<button class="result-photo" style="width:100%;display:grid;place-items:center;aspect-ratio:3/1.2" data-act="pick" data-src="gallery"><span class="muted small">${ic("image")}<br>Añadir foto (opcional)</span></button>`}
+  <div class="notice" style="margin-top:14px">${ic("info", "s")}<span><b>Valores aproximados.</b> ${d.source === "ai" ? "Son estimaciones a partir de una foto, no cifras exactas. Revisa los alimentos y ajusta los gramos antes de guardar." : "Los nutrientes dependen de la receta y la marca; usa la etiqueta cuando la tengas."}${d.notes ? " " + esc(d.notes) : ""}</span></div>
+
+  <div class="field" style="margin-top:16px"><label class="f">Nombre del plato</label><input class="input" id="r-title" maxlength="80" value="${esc(d.title)}" placeholder="Ej. Ensalada de pollo"></div>
+
+  <div class="section-title" style="margin-top:8px"><h2>Alimentos <span class="muted" style="font-weight:500">(${d.items.length})</span></h2><button class="btn sm ghost" data-act="add-item">${ic("plus", "s")} Añadir</button></div>
+  <div id="items">${d.items.length ? d.items.map(itemHTML).join("") : `<div class="empty-state card flat"><div class="ic">${ic("bowl")}</div><b>Sin alimentos todavía</b><p class="small">Añade lo que has comido con su cantidad.</p></div>`}</div>
+
+  <div class="section-title"><h2>Total estimado</h2><span class="pill lime" id="tot-kcal">${fmt(t.kcal)} kcal</span></div>
+  <div class="card"><div class="ntable" id="tot-table">${totalsTable(t)}</div></div>
+
+  <div class="section-title"><h2>¿Cuándo?</h2></div>
+  <div class="chips" style="margin-bottom:12px">${MEAL_ORDER.map((k) => `<button class="chip ${d.meal_type === k ? "on" : ""}" data-act="draft-type" data-v="${k}">${MEAL_TYPES[k]}</button>`).join("")}</div>
+  <input class="input" type="datetime-local" id="r-when" value="${toLocalInput(d.eaten_at)}" max="${toLocalInput(new Date())}">
+
+  <div class="sticky-save"><button class="btn primary block" data-act="save-meal" ${d.items.length ? "" : "disabled"} style="height:56px;box-shadow:var(--shadow-lg)">${ic("check", "s")} ${d.id ? "Guardar cambios" : "Guardar registro"}</button></div>`;
+}
+function totalsTable(t) { return NK.map((k) => `<div><span class="muted">${NL[k]}</span><span>${fmt(t[k], k === "kcal" || k === "sodium_mg" ? 0 : 1)} ${NU[k]}</span></div>`).join(""); }
+function itemHTML(it, i) {
+  const t = itemTotals(it);
+  const src = it.source === "usda" ? `<span class="pill db">USDA</span>` : it.source === "ai" ? `<span class="pill ai">Estimación IA</span>` : `<span class="pill">Manual</span>`;
+  const conf = it.confidence != null && it.source !== "manual" ? `<span class="pill">${Math.round(it.confidence * 100)}% seguro</span>` : "";
+  return `<div class="item" data-i="${i}">
+    <div class="row between" style="align-items:flex-start"><input class="name-in" data-field="name" value="${esc(it.name)}" aria-label="Nombre del alimento" maxlength="80">
+      <button class="icon-btn sm" data-act="del-item" aria-label="Eliminar alimento">${ic("trash", "s")}</button></div>
+    <div class="row" style="gap:6px;margin:6px 0 12px;flex-wrap:wrap">${src}${conf}${it._renamed && aiReady() ? `<button class="pill lime" data-act="recalc-item">${ic("refresh", "s")} Recalcular</button>` : ""}</div>
+    <div class="row between">
+      <div class="stepper"><button data-act="grams" data-d="-10" aria-label="Menos">${ic("minus", "s")}</button><input type="number" inputmode="numeric" min="1" max="3000" data-field="grams" value="${Math.round(it.grams)}" aria-label="Gramos"><button data-act="grams" data-d="10" aria-label="Más">${ic("plus", "s")}</button></div>
+      <span class="small muted">g</span>
+      <div style="flex:1;text-align:right"><b class="num" style="font-size:22px" data-k="kcal">${fmt(t.kcal)}</b> <span class="small muted">kcal</span></div>
+    </div>
+    <div class="macro-mini" style="margin-top:10px"><span>P <b data-k="protein">${fmt(t.protein, 1)}</b>g</span><span>C <b data-k="carbs">${fmt(t.carbs, 1)}</b>g</span><span>G <b data-k="fat">${fmt(t.fat, 1)}</b>g</span><span>Fibra <b data-k="fiber">${fmt(t.fiber, 1)}</b>g</span></div>
+    <details class="details acc"><summary class="small">Más nutrientes ${ic("down", "s")}</summary>
+      <div class="macro-mini" style="margin-top:8px"><span>Saturadas <b data-k="sat_fat">${fmt(t.sat_fat, 1)}</b>g</span><span>Azúcares <b data-k="sugar">${fmt(t.sugar, 1)}</b>g</span><span>Sodio <b data-k="sodium_mg">${fmt(t.sodium_mg)}</b>mg</span></div>
+      <p class="xs muted" style="margin-top:8px">Por 100 g: ${fmt(it.per100g.kcal)} kcal · P ${fmt(it.per100g.protein, 1)} · C ${fmt(it.per100g.carbs, 1)} · G ${fmt(it.per100g.fat, 1)}</p></details>
+  </div>`;
+}
+function refreshDraftNumbers() {
+  const d = S.draft;
+  $$("#items .item").forEach((el) => {
+    const it = d.items[+el.dataset.i]; if (!it) return;
+    const t = itemTotals(it);
+    $$("[data-k]", el).forEach((b) => (b.textContent = fmt(t[b.dataset.k], b.dataset.k === "kcal" || b.dataset.k === "sodium_mg" ? 0 : 1)));
+  });
+  const t = sumItems(d.items);
+  $("#tot-kcal").textContent = fmt(t.kcal) + " kcal";
+  $("#tot-table").innerHTML = totalsTable(t);
+}
+afterRender.results = () => {
+  $("#r-title").oninput = (e) => (S.draft.title = e.target.value);
+  $("#r-when").onchange = (e) => { if (e.target.value) S.draft.eaten_at = new Date(e.target.value); };
+  $("#items").addEventListener("input", (e) => {
+    const el = e.target.closest(".item"); if (!el) return;
+    const it = S.draft.items[+el.dataset.i];
+    if (e.target.dataset.field === "grams") { it.grams = clamp(Number(e.target.value) || 0, 0, 3000); refreshDraftNumbers(); }
+    if (e.target.dataset.field === "name") { it.name = e.target.value; if (!it._renamed) { it._renamed = true; } }
+  });
+  $("#items").addEventListener("change", (e) => { if (e.target.dataset.field === "name" && aiReady()) rerenderKeepScroll(); });
+};
+function addItemSheet() {
+  const ready = aiReady();
+  openSheet(`<h2>Añadir alimento</h2><p class="muted small">${ready ? "Escribe el alimento y la cantidad: buscamos sus nutrientes en USDA o los estima la IA." : "La búsqueda automática está pendiente (requiere IA). Introduce los valores por 100 g de la etiqueta."}</p>
+    <div class="field" style="margin-top:12px"><label class="f">Alimento</label><input class="input" id="ai-name" maxlength="80" placeholder="Ej. Tortilla de patatas"></div>
+    <div class="field"><label class="f">Cantidad (g)</label><input class="input" id="ai-grams" type="number" inputmode="numeric" min="1" value="100"></div>
+    <div id="manual-fields" class="${ready ? "hide" : ""}">
+      <p class="eyebrow" style="margin:6px 0 10px">Valores por 100 g</p>
+      <div class="grid2">${["kcal", "protein", "carbs", "fat", "fiber", "sugar", "sat_fat", "sodium_mg"].map((k) => `<div class="field" style="margin:0"><label class="f">${NL[k]} (${NU[k]})</label><input class="input" type="number" inputmode="decimal" min="0" step="0.1" data-n="${k}" placeholder="0"></div>`).join("")}</div>
+    </div>
+    ${ready ? `<button class="link small" style="margin:4px 0 12px" id="ai-toggle">Prefiero introducir los valores manualmente</button>` : ""}
+    <button class="btn primary block" style="margin-top:14px" id="ai-add">${ready ? ic("spark", "s") + " Buscar y añadir" : "Añadir"}</button>`, (sh) => {
+    let manual = !ready;
+    $("#ai-toggle", sh)?.addEventListener("click", () => { manual = true; $("#manual-fields", sh).classList.remove("hide"); $("#ai-toggle", sh).remove(); $("#ai-add", sh).textContent = "Añadir"; });
+    $("#ai-add", sh).onclick = async () => {
+      const name = $("#ai-name", sh).value.trim(), grams = Number($("#ai-grams", sh).value) || 0;
+      if (!name || grams <= 0) return toast("Escribe el alimento y su cantidad.", "err");
+      const btn = $("#ai-add", sh);
+      if (manual) {
+        const per100g = zero(); $$("[data-n]", sh).forEach((i) => (per100g[i.dataset.n] = Number(i.value) || 0));
+        S.draft.items.push({ name, grams, per100g, source: "manual" });
+      } else {
+        btn.disabled = true; btn.innerHTML = `<span class="spinner"></span> Buscando…`;
+        try { const r = await ai("lookup", { name }); S.draft.items.push({ name: r.name || name, grams, per100g: r.per100g, source: r.source, confidence: null }); }
+        catch (e) { btn.disabled = false; btn.textContent = "Buscar y añadir"; return toast(e.message, "err"); }
+      }
+      closeSheet(); rerenderKeepScroll();
+    };
+  });
+}
+async function saveDraft() {
+  const d = S.draft;
+  if (!d.items.length) return toast("Añade al menos un alimento.", "err");
+  if (new Date(d.eaten_at) > new Date(Date.now() + 5 * 60000)) return toast("La fecha no puede ser futura.", "err");
+  const btn = $("[data-act='save-meal']"); btn.disabled = true; btn.innerHTML = `<span class="spinner"></span> Guardando…`;
+  try {
+    const items = d.items.map(({ _renamed, ...it }) => ({ ...it, grams: Math.round(it.grams) }));
+    const title = d.title.trim() || items.map((i) => i.name).slice(0, 3).join(", ");
+    await DB.saveMeal({ id: d.id, photo_path: d.photo_path, meal_type: d.meal_type, eaten_at: d.eaten_at, title, items, source: d.source, notes: d.notes, totals: sumItems(items) }, d.photoBlob);
+    if (d.photoBlob && d.photo_url?.startsWith("blob:")) URL.revokeObjectURL(d.photo_url);
+    S.draft = null; invalidate();
+    success(d.id ? "Cambios guardados" : "¡Registro guardado!", "Tu resumen del día se ha actualizado.");
+    S.tab = "home"; S.day.loaded = false; render("home"); loadDay();
+  } catch (e) { btn.disabled = false; btn.innerHTML = `${ic("check", "s")} Guardar registro`; toast("No se pudo guardar: " + e.message, "err"); }
+}
+
+/* Detalle de comida */
+function findMeal(id) { return [...S.day.meals, ...S.hist.meals, ...S.nut.meals].find((m) => m.id === id); }
+function mealSheet(m) {
+  const t = Object.fromEntries(NK.map((k) => [k, Number(m[k]) || 0]));
+  openSheet(`${m.photo_url ? `<div class="result-photo" style="margin-bottom:14px"><img src="${esc(m.photo_url)}" alt=""></div>` : ""}
+    <p class="eyebrow">${MEAL_TYPES[m.meal_type]} · ${esc(longDate(m.eaten_at))} · ${timeStr(m.eaten_at)}</p>
+    <h2 style="margin:4px 0 12px">${esc(m.title || "Comida")}</h2>
+    <div class="list" style="margin-bottom:14px">${(m.items || []).map((it) => { const x = itemTotals(it); return `<div class="li"><div class="t"><b>${esc(it.name)}</b><span>${fmt(it.grams)} g · P ${fmt(x.protein, 1)} · C ${fmt(x.carbs, 1)} · G ${fmt(x.fat, 1)}</span></div><b class="num">${fmt(x.kcal)}<span class="xs muted"> kcal</span></b></div>`; }).join("")}</div>
+    <div class="card flat"><div class="ntable">${totalsTable(t)}</div><p class="xs muted" style="margin:10px 0 0">Valores aproximados${m.source === "ai" ? " estimados con IA a partir de la foto" : ""}.</p></div>
+    <div class="grid2" style="margin-top:16px"><button class="btn danger" data-act="del-meal" data-id="${m.id}">${ic("trash", "s")} Eliminar</button><button class="btn primary" data-act="edit-meal" data-id="${m.id}">${ic("edit", "s")} Editar</button></div>`);
+}
+
+/* ════════════════ HISTORIAL ════════════════ */
+async function loadMonth() {
+  const from = new Date(S.hist.month), to = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+  try {
+    const [meals, water] = await Promise.all([DB.listMeals(from, to), DB.listWater(from, to)]);
+    Object.assign(S.hist, { meals, water, loaded: true });
+  } catch (e) { S.hist.loaded = true; toast("No se pudo cargar el historial: " + e.message, "err"); }
+  if (S.view === "history") rerenderKeepScroll();
+}
+function vHistory() {
+  const H = S.hist, m0 = H.month, today = sod(new Date());
+  const first = (m0.getDay() + 6) % 7, dim = new Date(m0.getFullYear(), m0.getMonth() + 1, 0).getDate();
+  const has = new Set(H.meals.map((m) => dkey(m.eaten_at)));
+  const cells = [];
+  for (let i = 0; i < first; i++) cells.push(`<span></span>`);
+  for (let d = 1; d <= dim; d++) {
+    const date = new Date(m0.getFullYear(), m0.getMonth(), d), k = dkey(date);
+    const cls = [sameDay(date, today) ? "today" : "", sameDay(date, H.sel) ? "sel" : "", has.has(k) ? "has" : ""].join(" ");
+    cells.push(`<button class="${cls}" data-act="hist-day" data-d="${k}" ${date > today ? "disabled" : ""}>${d}</button>`);
+  }
+  const isCurMonth = m0.getFullYear() === today.getFullYear() && m0.getMonth() === today.getMonth();
+  const dayMeals = H.meals.filter((m) => sameDay(m.eaten_at, H.sel));
+  const dayWater = H.water.filter((w) => sameDay(w.logged_at, H.sel)).reduce((a, w) => a + w.ml, 0);
+  const t = sumMeals(dayMeals);
+  const monthName = m0.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+  const photos = H.meals.filter((m) => m.photo_url).slice().reverse();
+  return `<div class="page-head"><div style="flex:1"><p class="eyebrow">Tus registros</p><h1>Historial</h1></div></div>
+  <div class="seg" style="margin-bottom:14px"><button class="${H.mode === "days" ? "on" : ""}" data-act="hist-mode" data-m="days">Calendario</button><button class="${H.mode === "gallery" ? "on" : ""}" data-act="hist-mode" data-m="gallery">Galería de fotos</button></div>
+  <div class="card">
+    <div class="row between" style="margin-bottom:10px"><button class="icon-btn sm" data-act="hist-month" data-d="-1" aria-label="Mes anterior">${ic("back", "s")}</button>
+      <h3>${cap(monthName)}</h3><button class="icon-btn sm" data-act="hist-month" data-d="1" ${isCurMonth ? "disabled style='opacity:.3'" : ""} aria-label="Mes siguiente">${ic("right", "s")}</button></div>
+    ${H.mode === "days" ? `<div class="cal">${["L", "M", "X", "J", "V", "S", "D"].map((d) => `<span class="dow">${d}</span>`).join("")}${cells.join("")}</div>` :
+      (!H.loaded ? `<div class="skeleton" style="height:200px"></div>` : photos.length ? `<div class="gallery">${photos.map((m) => `<button data-act="meal" data-id="${m.id}"><img src="${esc(m.photo_url)}" alt="" loading="lazy"><span>${new Date(m.eaten_at).getDate()}/${new Date(m.eaten_at).getMonth() + 1}</span></button>`).join("")}</div>` : `<div class="empty-state"><div class="ic">${ic("image")}</div>Sin fotos este mes.</div>`)}
+  </div>
+  ${H.mode === "days" ? `
+  <div class="section-title"><h2>${esc(cap(longDate(H.sel)))}</h2></div>
+  ${!H.loaded ? `<div class="skeleton" style="height:120px"></div>` : `
+  <div class="grid4" style="margin-bottom:14px">
+    <div class="tile"><div class="k">kcal</div><div class="v num" style="font-size:18px">${fmt(t.kcal)}</div></div>
+    <div class="tile"><div class="k">Prot.</div><div class="v num" style="font-size:18px">${fmt(t.protein)}<span class="xs muted">g</span></div></div>
+    <div class="tile"><div class="k">Fibra</div><div class="v num" style="font-size:18px">${fmt(t.fiber)}<span class="xs muted">g</span></div></div>
+    <div class="tile"><div class="k">Agua</div><div class="v num" style="font-size:18px">${fmt(dayWater / 1000, 1)}<span class="xs muted">L</span></div></div>
+  </div>
+  ${dayMeals.length ? dayMeals.map(mealSlotHTML).join("") : `<div class="empty-state card flat"><div class="ic">${ic("cal")}</div>No hay comidas registradas este día.</div>`}
+  ${!sameDay(H.sel, new Date()) ? `<button class="btn ghost block" style="margin-top:6px" data-act="add-past">${ic("plus", "s")} Añadir comida a este día</button>` : ""}`}` : ""}`;
+}
+
+/* ════════════════ MI NUTRICIÓN ════════════════ */
+async function loadNut() {
+  const days = S.nut.period === "week" ? 7 : 30, to = addDays(sod(new Date()), 1), from = addDays(to, -days);
+  try {
+    const [meals, water] = await Promise.all([DB.listMeals(from, to), DB.listWater(from, to)]);
+    Object.assign(S.nut, { meals, water, loaded: true, from, days });
+  } catch (e) { S.nut.loaded = true; toast("No se pudieron cargar tus estadísticas: " + e.message, "err"); }
+  if (S.view === "nutrition") rerenderKeepScroll();
+}
+function barChart(series, goal, color, unit = "") {
+  const W = 320, H = 150, pad = 18, n = series.length, max = Math.max(goal || 0, ...series.map((s) => s.v), 1) * 1.12;
+  const bw = Math.max(3, (W - pad) / n * 0.62), step = (W - pad) / n;
+  const y = (v) => H - 22 - (v / max) * (H - 34);
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfico">`;
+  if (goal) s += `<line x1="0" x2="${W}" y1="${y(goal)}" y2="${y(goal)}" stroke="var(--muted)" stroke-dasharray="4 4" stroke-width="1" opacity=".6"/><text x="${W}" y="${y(goal) - 4}" text-anchor="end">${fmt(goal)}${unit}</text>`;
+  series.forEach((p, i) => {
+    const x = pad / 2 + i * step + (step - bw) / 2, h = Math.max(p.v ? 3 : 0, H - 22 - y(p.v));
+    s += `<rect x="${x}" y="${H - 22 - h}" width="${bw}" height="${h}" rx="${Math.min(6, bw / 2)}" fill="${color}" opacity="${p.v ? 1 : .25}"><title>${p.title}: ${fmt(p.v)}${unit}</title></rect>`;
+    if (n <= 7 || i % 5 === 0 || i === n - 1) s += `<text x="${x + bw / 2}" y="${H - 6}" text-anchor="middle">${p.label}</text>`;
+  });
+  return s + `</svg>`;
+}
+function donut(parts) {
+  const r = 50, c = 2 * Math.PI * r, total = parts.reduce((a, p) => a + p.v, 0) || 1;
+  let acc = 0;
+  return `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="16"/>${parts.map((p) => {
+    const len = (p.v / total) * c, seg = `<circle cx="60" cy="60" r="${r}" fill="none" stroke="${p.color}" stroke-width="16" stroke-dasharray="${Math.max(0, len - 2)} ${c}" stroke-dashoffset="${-acc}"/>`;
+    acc += len; return seg;
+  }).join("")}</svg>`;
+}
+const NUTRIENT_INFO = [
+  ["Proteínas", "protein", "Forman y reparan músculos, piel y defensas. Están en legumbres, huevos, lácteos, pescado, carne, tofu y frutos secos."],
+  ["Carbohidratos", "carbs", "La principal fuente de energía, sobre todo para el cerebro y el ejercicio. Mejor si vienen de cereales integrales, fruta, legumbres y tubérculos."],
+  ["Grasas", "fat", "Necesarias para absorber vitaminas A, D, E y K y para las hormonas. El aceite de oliva, el aguacate, los frutos secos y el pescado azul aportan grasas de calidad."],
+  ["Fibra", "fiber", "Ayuda a la digestión, alimenta tu microbiota y aporta saciedad. Verduras, fruta con piel, legumbres e integrales son tus aliados."],
+  ["Agua", "water", "Regula la temperatura, transporta nutrientes y mantiene tu energía. Las necesidades varían con el calor y la actividad."],
+  ["Sodio y azúcares", "sodium", "Conviene vigilarlos en ultraprocesados y bebidas. La OMS sugiere menos de 2.000 mg de sodio y menos del 10 % de la energía en azúcares libres."],
+];
+function vNutrition() {
+  const N = S.nut, p = S.profile, days = N.period === "week" ? 7 : 30;
+  if (!N.loaded) return `<div class="page-head"><div><p class="eyebrow">Análisis</p><h1>Mi nutrición</h1></div></div><div class="skeleton" style="height:220px;margin-bottom:12px"></div><div class="skeleton" style="height:180px"></div>`;
+  const from = N.from, byDay = [];
+  for (let i = 0; i < days; i++) {
+    const d = addDays(from, i), k = dkey(d), ms = N.meals.filter((m) => dkey(m.eaten_at) === k);
+    const t = sumMeals(ms), w = N.water.filter((x) => dkey(x.logged_at) === k).reduce((a, x) => a + x.ml, 0);
+    byDay.push({ d, t, w, n: ms.length, label: days === 7 ? d.toLocaleDateString("es-ES", { weekday: "narrow" }).toUpperCase() : String(d.getDate()) });
+  }
+  const logged = byDay.filter((x) => x.n > 0), nd = logged.length || 1;
+  const tot = sumMeals(N.meals);
+  const avg = (k) => logged.reduce((a, x) => a + x.t[k], 0) / nd;
+  const pK = tot.protein * 4, cK = tot.carbs * 4, fK = tot.fat * 9, mK = pK + cK + fK || 1;
+  const foods = {};
+  N.meals.forEach((m) => (m.items || []).forEach((it) => {
+    const key = (it.name || "").trim().toLowerCase(); if (!key) return;
+    const x = itemTotals(it); foods[key] ??= { name: it.name, n: 0, protein: 0, fiber: 0 };
+    foods[key].n++; foods[key].protein += x.protein; foods[key].fiber += x.fiber;
+  }));
+  const fl = Object.values(foods);
+  const top = (k) => fl.slice().sort((a, b) => b[k] - a[k]).filter((f) => f[k] > 0).slice(0, 4);
+  const waterDays = byDay.filter((x) => x.w > 0), avgWater = waterDays.reduce((a, x) => a + x.w, 0) / (waterDays.length || 1);
+  return `<div class="page-head"><div style="flex:1"><p class="eyebrow">Análisis</p><h1>Mi nutrición</h1></div></div>
+  <div class="seg" style="margin-bottom:16px"><button class="${N.period === "week" ? "on" : ""}" data-act="nut-period" data-p="week">7 días</button><button class="${N.period === "month" ? "on" : ""}" data-act="nut-period" data-p="month">30 días</button></div>
+  ${!N.meals.length ? `<div class="card empty-state"><div class="ic">${ic("chart")}</div><b>Aún no hay registros en este periodo</b><p class="small">Escanea tus comidas y aquí verás tu evolución.</p><button class="btn primary" data-act="tab" data-tab="scan">${ic("camera", "s")} Escanear</button></div>` : `
+  <div class="grid2">
+    <div class="tile"><div class="k">${ic("flame", "s")} Media diaria</div><div class="v num">${fmt(avg("kcal"))} <span class="small muted">kcal</span></div></div>
+    <div class="tile"><div class="k">${ic("cal", "s")} Días con registro</div><div class="v num">${logged.length}<span class="small muted"> / ${days}</span></div></div>
+    <div class="tile"><div class="k">${ic("leaf", "s")} Alimentos distintos</div><div class="v num">${fl.length}</div></div>
+    <div class="tile"><div class="k">${ic("bowl", "s")} Comidas</div><div class="v num">${N.meals.length}</div></div>
+  </div>
+  <p class="xs muted" style="margin:8px 4px 0">Las medias se calculan solo con los días en los que registraste algo.</p>
+
+  <div class="section-title"><h2>Energía por día</h2><span class="small muted">— objetivo</span></div>
+  <div class="card">${barChart(byDay.map((x) => ({ v: Math.round(x.t.kcal), label: x.label, title: x.d.toLocaleDateString("es-ES") })), p.kcal_goal, "var(--c-kcal)", " kcal")}</div>
+
+  <div class="section-title"><h2>Distribución de macronutrientes</h2></div>
+  <div class="card donut-wrap">${donut([{ v: pK, color: "var(--c-protein)" }, { v: cK, color: "var(--c-carbs)" }, { v: fK, color: "var(--c-fat)" }])}
+    <div class="stack" style="flex:1">${[["Proteínas", pK, "protein", tot.protein], ["Carbohidratos", cK, "carbs", tot.carbs], ["Grasas", fK, "fat", tot.fat]].map(([l, v, k, g]) =>
+      `<div><div class="row between"><span class="name row small" style="gap:6px;font-weight:700"><i class="dot" style="background:${NC[k]}"></i>${l}</span><b class="num">${Math.round((v / mK) * 100)}%</b></div><div class="xs muted">${fmt(g / nd)} g/día de media</div></div>`).join("")}</div></div>
+
+  <div class="section-title"><h2>Fibra</h2><span class="small muted">media ${fmt(avg("fiber"), 1)} g/día</span></div>
+  <div class="card">${barChart(byDay.map((x) => ({ v: Math.round(x.t.fiber), label: x.label, title: x.d.toLocaleDateString("es-ES") })), p.fiber_goal, "var(--c-fiber)", " g")}</div>
+
+  <div class="section-title"><h2>Hidratación</h2><span class="small muted">media ${fmt(avgWater / 1000, 1)} L/día</span></div>
+  <div class="card">${barChart(byDay.map((x) => ({ v: x.w, label: x.label, title: x.d.toLocaleDateString("es-ES") })), p.water_goal_ml, "var(--c-water)", " ml")}</div>
+
+  <div class="section-title"><h2>Tu variedad</h2></div>
+  <div class="card">
+    <p class="small" style="margin:0 0 12px">Has registrado <b>${fl.length} alimentos distintos</b> en ${days} días. ${fl.length >= 20 ? "¡Una alimentación muy variada!" : "Probar algo nuevo cada semana es una forma sencilla de sumar nutrientes."}</p>
+    <div class="chips">${fl.slice().sort((a, b) => b.n - a.n).slice(0, 12).map((f) => `<span class="pill">${esc(f.name)} · ${f.n}</span>`).join("")}</div>
+    ${top("protein").length ? `<div class="divider"></div><p class="eyebrow" style="margin:0 0 8px">Te aportan más proteína</p><div class="small">${top("protein").map((f) => `${esc(f.name)} <span class="muted">(${fmt(f.protein)} g)</span>`).join(" · ")}</div>` : ""}
+    ${top("fiber").length ? `<p class="eyebrow" style="margin:14px 0 8px">Te aportan más fibra</p><div class="small">${top("fiber").map((f) => `${esc(f.name)} <span class="muted">(${fmt(f.fiber, 1)} g)</span>`).join(" · ")}</div>` : ""}
+  </div>`}
+
+  <div class="section-title"><h2>Aprende sobre nutrientes</h2></div>
+  <div class="stack">${NUTRIENT_INFO.map(([t, k, d]) => `<details class="card acc"><summary><span class="row" style="gap:10px"><i class="dot" style="background:${NC[k] || (k === "water" ? "var(--c-water)" : "var(--muted)")};width:12px;height:12px"></i>${t}</span>${ic("down", "s")}</summary><p>${d}</p></details>`).join("")}</div>
+
+  <button class="scan-cta" style="background:var(--forest);color:var(--lime);margin-top:18px" data-act="open-chat"><div class="ic" style="background:var(--lime);color:#0F3B2C">${ic("spark")}</div><div><b style="color:inherit">Pregunta a NutriScan AI</b><span style="color:var(--hero-muted)">Explicaciones y ideas personalizadas</span></div></button>`;
+}
+
+/* ════════════════ CHAT ════════════════ */
+const SUGGESTIONS = ["¿Qué nutrientes tiene mi última comida?", "¿Qué alimentos contienen proteínas?", "¿Qué puedo preparar con huevos, espinacas y arroz?", "¿Cómo puedo conseguir una alimentación más variada?", "¿Qué nutrientes aporta el aguacate?", "Dame ideas de desayunos equilibrados"];
+function mdLite(s) {
+  const lines = esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").split("\n");
+  let out = "", inList = false;
+  for (const l of lines) {
+    const m = l.match(/^\s*(?:[-•*]|\d+\.)\s+(.*)/);
+    if (m) { if (!inList) { out += "<ul>"; inList = true; } out += `<li>${m[1]}</li>`; continue; }
+    if (inList) { out += "</ul>"; inList = false; }
+    if (l.trim()) out += `<p>${l.replace(/^#+\s*/, "")}</p>`;
+  }
+  return out + (inList ? "</ul>" : "");
+}
+function vChat() {
+  const ready = aiReady();
+  return `<div class="page-head"><button class="icon-btn" data-act="back-from-chat" aria-label="Volver">${ic("back", "s")}</button>
+    <div class="avatar ai-badge">${ic("spark", "s")}</div><div style="flex:1"><h1 style="font-size:20px">NutriScan AI</h1><p class="xs muted" style="margin:0">Información educativa · no sustituye a un profesional</p></div>
+    ${S.chat.length ? `<button class="icon-btn sm" data-act="chat-clear" aria-label="Borrar conversación">${ic("trash", "s")}</button>` : ""}</div>
+  <div class="chat">
+    ${!ready ? `<div class="notice">${ic("info", "s")}<div><b>Asistente pendiente de configurar.</b> ${S.mode === "local" ? "Necesitas una cuenta de NutriScan para usar la IA." : esc(S.ai?.message || "Conecta tu cuenta de Claude en Perfil para chatear.")}
+      ${S.mode === "cloud" ? `<div style="margin-top:8px"><button class="btn sm primary" data-act="claude-sheet">${ic("key", "s")} Conectar Claude</button></div>` : ""}</div></div>` : ""}
+    <div class="msgs" id="msgs">
+      ${!S.chat.length ? `<div class="bubble bot"><p>¡Hola${S.profile.display_name ? ", " + esc(S.profile.display_name) : ""}! Soy tu asistente de nutrición. Puedo explicarte qué aportan los alimentos, darte ideas de comidas o recetas con lo que tengas en casa. ¿En qué te ayudo?</p></div>
+        <div class="suggest">${SUGGESTIONS.map((s) => `<button data-act="chat-suggest" data-q="${esc(s)}" ${ready ? "" : "disabled style='opacity:.5'"}>${ic("spark", "s")}${esc(s)}</button>`).join("")}</div>` : ""}
+      ${S.chat.map((m) => `<div class="bubble ${m.role === "user" ? "me" : "bot"}">${m.role === "user" ? esc(m.content).replace(/\n/g, "<br>") : mdLite(m.content)}</div>`).join("")}
+      ${S.chatBusy ? `<div class="bubble bot"><div class="typing"><i></i><i></i><i></i></div></div>` : ""}
+    </div>
+    <form class="composer" id="composer"><textarea id="chat-in" rows="1" placeholder="Escribe tu pregunta…" maxlength="2000" ${ready ? "" : "disabled"}></textarea><button class="send" type="submit" aria-label="Enviar" ${ready && !S.chatBusy ? "" : "disabled"}>${ic("send", "s")}</button></form>
+  </div>`;
+}
+afterRender.chat = () => {
+  const ta = $("#chat-in");
+  ta.addEventListener("input", () => { ta.style.height = "auto"; ta.style.height = Math.min(120, ta.scrollHeight) + "px"; });
+  ta.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(pointer:fine)").matches) { e.preventDefault(); $("#composer").requestSubmit(); } });
+  $("#composer").onsubmit = (e) => { e.preventDefault(); sendChat(ta.value); };
+  window.scrollTo(0, document.body.scrollHeight);
+};
+const chatKey = () => `ns_chat_${S.user?.id || "local"}`;
+async function sendChat(text) {
+  text = String(text || "").trim();
+  if (!text || S.chatBusy || !aiReady()) return;
+  S.chat.push({ role: "user", content: text }); S.chatBusy = true; render("chat");
+  const p = S.profile, t = sumMeals(S.day.meals);
+  const context = {
+    nombre: p.display_name, edad: p.age, menor_de_edad: isMinor(), condicion_medica: p.medical_flag, actividad: ACTIVITY[p.activity], objetivo: GOALS[p.goal],
+    preferencias: p.diet_prefs, alergias: p.allergies, le_gusta: p.likes, no_le_gusta: p.dislikes,
+    objetivos_diarios: { kcal: p.kcal_goal, proteinas_g: p.protein_goal, carbohidratos_g: p.carbs_goal, grasas_g: p.fat_goal, fibra_g: p.fiber_goal },
+    hoy: { totales: Object.fromEntries(NK.map((k) => [k, Math.round(t[k])])), comidas: S.day.meals.map((m) => ({ tipo: MEAL_TYPES[m.meal_type], hora: timeStr(m.eaten_at), alimentos: (m.items || []).map((i) => `${i.name} (${i.grams} g)`) })) },
+  };
+  try {
+    const r = await ai("chat", { messages: S.chat.slice(-20), context });
+    S.chat.push({ role: "assistant", content: r.reply });
+  } catch (e) {
+    S.chat.pop(); toast(e.message, "err");
+    setTimeout(() => { const ta = $("#chat-in"); if (ta) ta.value = text; }, 50);
+  }
+  S.chatBusy = false; store.set(chatKey(), S.chat.slice(-40));
+  if (S.view === "chat") render("chat");
+}
+
+/* ════════════════ PERFIL ════════════════ */
+function suggestGoals(p) {
+  if (isProtected() || !p.age || !p.weight_kg || !p.height_cm || !p.sex) return null;
+  const w = +p.weight_kg, h = +p.height_cm, a = +p.age;
+  const bmr = 10 * w + 6.25 * h - 5 * a + (p.sex === "male" ? 5 : p.sex === "female" ? -161 : -78);
+  const tdee = bmr * ({ sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725, very_active: 1.9 }[p.activity] || 1.55);
+  let kcal = p.goal === "gain" ? tdee * 1.1 : p.goal === "lose_gradual" ? Math.max(tdee * 0.88, bmr * 1.15, 1500) : tdee;
+  kcal = Math.round(kcal / 50) * 50;
+  const protein = Math.round(w * (p.goal === "gain" ? 1.6 : p.goal === "lose_gradual" ? 1.4 : 1.1));
+  const fat = Math.round((kcal * 0.3) / 9), carbs = Math.max(130, Math.round((kcal - protein * 4 - fat * 9) / 4));
+  return { kcal_goal: kcal, protein_goal: protein, carbs_goal: carbs, fat_goal: fat, fiber_goal: Math.max(25, Math.round((kcal / 1000) * 14)), water_goal_ml: clamp(Math.round((w * 33) / 250) * 250, 1500, 3500) };
+}
+function vProfile() {
+  const p = S.profile, theme = store.get("ns_theme", "auto"), notif = p.settings?.notifications || {};
+  const aiLine = S.mode === "local" ? `<span class="status-dot" style="background:var(--muted)"></span>No disponible en modo local`
+    : S.ai?.configured ? `<span class="status-dot" style="background:var(--c-protein)"></span>Conectado · ${esc(S.ai.hint)}`
+    : `<span class="status-dot" style="background:var(--c-fat)"></span>${esc(S.ai?.reason === "not_deployed" ? "Servidor de IA pendiente" : "Sin conectar")}`;
+  return `<div class="page-head"><div class="avatar" style="width:58px;height:58px;font-size:24px;border-radius:20px">${esc((p.display_name?.[0] || "N").toUpperCase())}</div>
+    <div style="flex:1;min-width:0"><h1 style="font-size:22px">${esc(p.display_name || "Tu perfil")}</h1><p class="small muted" style="margin:0;overflow:hidden;text-overflow:ellipsis">${S.mode === "local" ? "Modo local (este dispositivo)" : esc(S.user?.email)}</p></div></div>
+
+  <div class="section-title" style="margin-top:6px"><h2>Inteligencia artificial</h2></div>
+  <div class="list"><button class="li" data-act="claude-sheet"><div class="ic">${ic("key", "s")}</div><div class="t"><b>Cuenta de Claude</b><span>${aiLine}</span></div>${ic("right", "s")}</button></div>
+
+  <div class="section-title"><h2>Datos personales</h2></div>
+  <div class="card">
+    <div class="grid2"><div class="field"><label class="f">Nombre o alias</label><input class="input" data-p="display_name" maxlength="40" value="${esc(p.display_name)}"></div>
+      <div class="field"><label class="f">Edad</label><input class="input" data-p="age" type="number" inputmode="numeric" min="14" max="120" value="${p.age ?? ""}"></div></div>
+    <div class="grid2"><div class="field"><label class="f">Peso (kg)</label><input class="input" data-p="weight_kg" type="number" inputmode="decimal" step="0.1" value="${p.weight_kg ?? ""}" placeholder="Opcional"></div>
+      <div class="field"><label class="f">Altura (cm)</label><input class="input" data-p="height_cm" type="number" inputmode="numeric" value="${p.height_cm ?? ""}" placeholder="Opcional"></div></div>
+    <div class="field"><label class="f">Sexo (para estimar energía)</label><select class="input" data-p="sex"><option value="">Prefiero no decirlo</option><option value="female" ${p.sex === "female" ? "selected" : ""}>Mujer</option><option value="male" ${p.sex === "male" ? "selected" : ""}>Hombre</option><option value="other" ${p.sex === "other" ? "selected" : ""}>Otro</option></select></div>
+    <div class="field"><label class="f">Nivel de actividad</label><select class="input" data-p="activity">${Object.entries(ACTIVITY).map(([k, v]) => `<option value="${k}" ${p.activity === k ? "selected" : ""}>${v}</option>`).join("")}</select></div>
+    <div class="field"><label class="f">Objetivo</label><select class="input" data-p="goal">${Object.entries(GOALS).map(([k, v]) => `<option value="${k}" ${p.goal === k ? "selected" : ""} ${k === "lose_gradual" && isProtected() ? "disabled" : ""}>${v}</option>`).join("")}</select></div>
+    <label class="check"><input type="checkbox" data-p="medical_flag" ${p.medical_flag ? "checked" : ""}> Condición médica, embarazo o necesidades especiales</label>
+  </div>
+
+  <div class="section-title"><h2>Preferencias alimentarias</h2></div>
+  <div class="card">
+    <div class="field"><label class="f">Tipo de alimentación</label><div class="chips" data-group="diet_prefs">${DIETS.map((d) => `<button class="chip ${p.diet_prefs?.includes(d) ? "on" : ""}" data-act="chipN" data-v="${d}" data-save="1">${d}</button>`).join("")}</div></div>
+    <div class="field"><label class="f">Alergias e intolerancias</label><div class="chips" data-group="allergies">${ALLERGENS.map((d) => `<button class="chip ${p.allergies?.includes(d) ? "on" : ""}" data-act="chipN" data-v="${d}" data-save="1">${d}</button>`).join("")}</div></div>
+    <div class="field"><label class="f">Alimentos que te gustan</label><input class="input" data-p="likes" maxlength="200" value="${esc(p.likes)}" placeholder="Ej. pasta, fresas, garbanzos"></div>
+    <div class="field" style="margin:0"><label class="f">Alimentos que no te gustan</label><input class="input" data-p="dislikes" maxlength="200" value="${esc(p.dislikes)}" placeholder="Ej. coliflor"></div>
+  </div>
+
+  <div class="section-title"><h2>Objetivos diarios</h2>${suggestGoals(p) ? `<button class="link small" data-act="suggest-goals">Calcular sugerencia</button>` : ""}</div>
+  ${isProtected() ? `<div class="notice info" style="margin-bottom:12px">${ic("info", "s")}<span>${isMinor() ? "Al ser menor de edad" : "Por tu situación de salud"}, NutriScan no calcula objetivos automáticos ni propone restricciones. Te recomendamos definirlos con un dietista-nutricionista o tu médico.</span></div>`
+    : !suggestGoals(p) ? `<p class="xs muted" style="margin:-4px 4px 10px">Completa edad, peso, altura y sexo si quieres una sugerencia orientativa.</p>` : ""}
+  <div class="card"><div class="grid2">
+    ${[["kcal_goal", "Energía (kcal)"], ["protein_goal", "Proteínas (g)"], ["carbs_goal", "Carbohidratos (g)"], ["fat_goal", "Grasas (g)"], ["fiber_goal", "Fibra (g)"], ["water_goal_ml", "Agua (ml)"]].map(([k, l]) =>
+      `<div class="field" style="margin:0"><label class="f">${l}</label><input class="input" data-p="${k}" type="number" inputmode="numeric" value="${p[k]}"></div>`).join("")}
+  </div><p class="xs muted" style="margin:12px 0 0">Los objetivos son orientativos. Cada cuerpo y cada día son distintos.</p></div>
+
+  <div class="section-title"><h2>Ajustes</h2></div>
+  <div class="list">
+    <div class="li"><div class="ic">${ic("sun", "s")}</div><div class="t"><b>Apariencia</b></div>
+      <select class="input" style="width:auto;height:38px" data-act-change="theme"><option value="auto" ${theme === "auto" ? "selected" : ""}>Sistema</option><option value="light" ${theme === "light" ? "selected" : ""}>Claro</option><option value="dark" ${theme === "dark" ? "selected" : ""}>Oscuro</option></select></div>
+    <div class="li"><div class="ic">${ic("bell", "s")}</div><div class="t"><b>Recordatorios</b><span>Comidas y agua</span></div>
+      <label class="switch"><input type="checkbox" data-act-change="notif" ${notif.enabled ? "checked" : ""}><span></span></label></div>
+    ${notif.enabled ? `<div class="li" style="display:block"><div class="grid2" style="gap:10px">
+      ${[["breakfast", "Desayuno", "08:30"], ["lunch", "Comida", "14:00"], ["snack", "Merienda", ""], ["dinner", "Cena", "21:00"]].map(([k, l, def]) => `<div><label class="f">${l}</label><input class="input" type="time" data-notif="${k}" value="${notif[k] ?? def}"></div>`).join("")}</div>
+      <label class="check" style="margin-top:12px"><input type="checkbox" data-notif="water" ${notif.water ? "checked" : ""}> Recordarme beber agua cada 2 horas (9:00–21:00)</label>
+      <p class="xs muted" style="margin:10px 0 0">Funcionan con la app abierta o en segundo plano. Las notificaciones push con la app cerrada están pendientes (requieren un servidor de envío).</p></div>` : ""}
+    <button class="li" data-act="replay-tutorial"><div class="ic">${ic("info", "s")}</div><div class="t"><b>Ver tutorial</b></div>${ic("right", "s")}</button>
+  </div>
+
+  <div class="section-title"><h2>Privacidad</h2></div>
+  <div class="list">
+    <button class="li" data-act="privacy"><div class="ic">${ic("shield", "s")}</div><div class="t"><b>Protección de datos</b><span>Qué guardamos y cómo</span></div>${ic("right", "s")}</button>
+    <button class="li" data-act="export"><div class="ic">${ic("download", "s")}</div><div class="t"><b>Descargar mis datos</b><span>Archivo JSON (portabilidad)</span></div>${ic("right", "s")}</button>
+    <button class="li" data-act="${S.mode === "local" ? "go-auth" : "logout"}"><div class="ic">${ic("logout", "s")}</div><div class="t"><b>${S.mode === "local" ? "Salir del modo local" : "Cerrar sesión"}</b></div></button>
+    <button class="li" data-act="delete-account" style="color:var(--danger)"><div class="ic" style="color:var(--danger)">${ic("trash", "s")}</div><div class="t"><b>Eliminar ${S.mode === "local" ? "datos locales" : "cuenta y datos"}</b></div></button>
+  </div>
+  <p class="xs muted" style="text-align:center;margin-top:22px">NutriScan · Eat smart. Live better.<br>Las estimaciones son orientativas y no constituyen consejo médico.</p>`;
+}
+let saveTimer;
+view.addEventListener("change", onProfileChange);
+async function onProfileChange(e) {
+  const el = e.target;
+  if (S.view !== "profile") return;
+  if (el.dataset.p) {
+    const k = el.dataset.p;
+    let v = el.type === "checkbox" ? el.checked : el.value;
+    if (["age", "kcal_goal", "protein_goal", "carbs_goal", "fat_goal", "fiber_goal", "water_goal_ml"].includes(k)) v = v === "" ? null : Math.round(Number(v));
+    if (["weight_kg", "height_cm"].includes(k)) v = v === "" ? null : Number(v);
+    if (k === "sex" && !v) v = null;
+    if (k === "age" && v != null && (v < 14 || v > 120)) return toast("La edad debe estar entre 14 y 120.", "err");
+    if (k.endsWith("_goal") && k !== "water_goal_ml" && (v == null || v < 0)) return toast("Introduce un número válido.", "err");
+    if (k === "kcal_goal" && (v < 800 || v > 6000)) return toast("El objetivo de energía debe estar entre 800 y 6000 kcal.", "err");
+    await saveProfile({ [k]: v }, ["age", "medical_flag"].includes(k));
+  } else if (el.dataset.notif) {
+    const n = { ...(S.profile.settings?.notifications || {}) };
+    n[el.dataset.notif] = el.type === "checkbox" ? el.checked : el.value;
+    await saveProfile({ settings: { ...S.profile.settings, notifications: n } });
+  } else if (el.dataset.actChange === "theme") {
+    store.set("ns_theme", el.value); applyTheme();
+  } else if (el.dataset.actChange === "notif") {
+    if (el.checked) {
+      if (!("Notification" in window)) { el.checked = false; return toast("Este navegador no admite notificaciones.", "err"); }
+      const perm = await Notification.requestPermission();
+      if (perm !== "granted") { el.checked = false; return toast("Permiso de notificaciones denegado.", "err"); }
+    }
+    const n = { breakfast: "08:30", lunch: "14:00", dinner: "21:00", water: false, ...(S.profile.settings?.notifications || {}), enabled: el.checked };
+    await saveProfile({ settings: { ...S.profile.settings, notifications: n } }, true);
+  }
+}
+async function saveProfile(patch, rerender = false) {
+  const prev = S.profile;
+  S.profile = { ...S.profile, ...patch };
+  if (S.profile.goal === "lose_gradual" && isProtected()) { S.profile.goal = "health"; patch.goal = "health"; }
+  try {
+    const saved = await DB.saveProfile(patch);
+    S.profile = { ...S.profile, ...saved };
+    clearTimeout(saveTimer); saveTimer = setTimeout(() => toast("Guardado"), 250);
+    if (rerender && S.view === "profile") rerenderKeepScroll();
+  } catch (e) { S.profile = prev; toast("No se pudo guardar: " + e.message, "err"); }
+}
+
+/* Conectar Claude */
+function claudeConnectHTML(inOnboarding = false) {
+  const st = S.ai || {};
+  if (S.mode === "local") return `<h2>Cuenta de Claude</h2><p class="muted">Para usar la IA necesitas una cuenta de NutriScan: tu clave se guarda cifrada en el servidor, nunca en el navegador.</p><button class="btn primary block" data-act="go-auth">Crear cuenta o iniciar sesión</button>`;
+  return `<${inOnboarding ? "h1" : "h2"}>Conecta Claude</${inOnboarding ? "h1" : "h2"}>
+  <p class="muted">NutriScan usa <b>Claude</b> (Anthropic) para reconocer tus platos y para el asistente.</p>
+  <div class="notice info" style="margin:12px 0">${ic("info", "s")}<span><b>¿Y mi suscripción Claude Pro?</b> Anthropic no permite que apps externas usen la suscripción Pro/Max de claude.ai. La conexión se hace con una <b>API key</b> de la consola de Claude, que se factura aparte por uso (≈ 3–5 céntimos por foto analizada).</span></div>
+  ${st.configured ? `<div class="notice ok" style="margin-bottom:12px">${ic("check", "s")}<span><b>Conectado</b> con la clave ${esc(st.hint)}. Puedes sustituirla o desconectarla.</span></div>` : ""}
+  ${st.reason === "not_deployed" || st.reason === "network" ? `<div class="notice" style="margin-bottom:12px">${ic("info", "s")}<span>${esc(st.message)}</span></div>` : ""}
+  <ol class="small" style="padding-left:18px;margin:0 0 14px;display:grid;gap:6px;color:var(--ink-2)">
+    <li>Entra en <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" class="link">console.anthropic.com → API Keys</a> con tu cuenta de Claude.</li>
+    <li>Añade algo de saldo en <i>Billing</i> (desde 5 $).</li><li>Crea una clave, cópiala y pégala aquí.</li></ol>
+  <div class="field"><label class="f" for="k-in">API key de Claude</label><input class="input" id="k-in" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…"></div>
+  <button class="btn primary block" id="k-save">${ic("shield", "s")} Validar y guardar cifrada</button>
+  ${st.configured ? `<button class="btn danger block" style="margin-top:10px" id="k-del">Desconectar</button>` : ""}
+  <p class="xs muted" style="margin-top:12px">La clave viaja por HTTPS a tu servidor, se valida con Anthropic, se cifra (AES-256-GCM) y se guarda en una tabla inaccesible desde la app. NutriScan nunca vuelve a mostrarla.</p>
+  ${inOnboarding ? `<p class="small muted" style="margin-top:6px">Puedes hacerlo más tarde desde Perfil.</p>` : ""}`;
+}
+afterRender.claude = () => {
+  const btn = $("#k-save"); if (!btn) return;
+  btn.onclick = async () => {
+    const key = $("#k-in").value.trim();
+    if (!key) return toast("Pega tu API key.", "err");
+    btn.disabled = true; btn.innerHTML = `<span class="spinner"></span> Validando con Anthropic…`;
+    try {
+      const r = await ai("save_key", { api_key: key });
+      S.ai = { ...(S.ai || {}), configured: true, hint: r.hint, reason: null };
+      $("#k-in").value = "";
+      success("¡Claude conectado!", "Ya puedes escanear tus platos.");
+      if ($(".sheet")) closeSheet();
+      if (S.view === "onboard") render("onboard"); else rerenderKeepScroll();
+    } catch (e) { toast(e.message, "err"); btn.disabled = false; btn.innerHTML = `${ic("shield", "s")} Validar y guardar cifrada`; }
+  };
+  $("#k-del")?.addEventListener("click", async () => {
+    if (!(await confirmSheet("¿Desconectar Claude?", "Se borrará tu clave del servidor. El escáner y el asistente quedarán desactivados.", "Desconectar"))) return;
+    try { await ai("delete_key"); S.ai = { ...S.ai, configured: false, hint: null }; toast("Clave eliminada"); rerenderKeepScroll(); } catch (e) { toast(e.message, "err"); }
+  });
+};
+
+function privacySheet() {
+  openSheet(`<h2>Protección de datos</h2>
+  <div class="small" style="color:var(--ink-2);display:grid;gap:10px;margin-top:10px">
+    <p style="margin:0"><b>Qué guardamos:</b> email, perfil (alias, edad, preferencias, alergias, objetivos), comidas con fotos y registro de agua. Son <b>datos relacionados con la salud</b>, por eso pedimos tu consentimiento expreso.</p>
+    <p style="margin:0"><b>Dónde:</b> en una base de datos Supabase individual protegida por políticas de acceso por usuario. Las fotos son privadas y se sirven con enlaces temporales.</p>
+    <p style="margin:0"><b>IA:</b> cuando analizas una foto o usas el chat, el contenido se envía a Anthropic (Claude) mediante tu propia API key para procesarlo. Anthropic no entrena sus modelos con datos de la API por defecto.</p>
+    <p style="margin:0"><b>Tu clave de Claude:</b> se guarda cifrada en el servidor y nunca se expone en la app.</p>
+    <p style="margin:0"><b>Tus derechos (RGPD/LOPDGDD):</b> acceso, rectificación, supresión, portabilidad y retirada del consentimiento en cualquier momento desde Perfil (descargar datos / eliminar cuenta). Edad mínima: 14 años.</p>
+    <p style="margin:0"><b>No vendemos tus datos</b> ni mostramos publicidad.</p>
+    <p class="xs muted" style="margin:0">Resumen informativo. El responsable del tratamiento debe completar la política de privacidad legal antes de publicar la app.</p>
+  </div><button class="btn primary block" style="margin-top:16px" data-act="close-sheet">Entendido</button>`);
+}
+async function exportData() {
+  try {
+    const meals = await DB.listAllMeals();
+    const water = S.mode === "local" ? localDB().water : (await sb.from("water_logs").select("*").order("logged_at")).data;
+    const data = { exported_at: new Date().toISOString(), app: "NutriScan", account: S.mode === "local" ? "local" : S.user.email, profile: S.profile, meals: meals.map(({ photo_data, photo_url, ...m }) => m), water };
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+    a.download = `nutriscan-datos-${dkey(new Date())}.json`; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast("Datos descargados");
+  } catch (e) { toast("No se pudo exportar: " + e.message, "err"); }
+}
+async function deleteAccount() {
+  const local = S.mode === "local";
+  if (!(await confirmSheet(local ? "¿Borrar los datos de este dispositivo?" : "¿Eliminar tu cuenta?", local ? "Se borrarán perfil, comidas y fotos guardadas en este navegador." : "Se borrarán para siempre tu cuenta, comidas, fotos, agua y la clave de Claude. No se puede deshacer.", "Eliminar definitivamente"))) return;
+  try {
+    if (local) { store.del(LOCAL_KEY); store.del("ns_mode"); store.del(chatKey()); location.reload(); return; }
+    await ai("delete_account");
+    store.del(chatKey()); await sb.auth.signOut(); toast("Cuenta eliminada");
+  } catch (e) { toast(e.code === "not_deployed" ? "Para eliminar la cuenta hace falta la función del servidor desplegada." : e.message, "err"); }
+}
+
+/* ════════════════ Recordatorios ════════════════ */
+function startReminders() {
+  setInterval(async () => {
+    const n = S.profile?.settings?.notifications;
+    if (!n?.enabled || !("Notification" in window) || Notification.permission !== "granted") return;
+    const now = new Date(), hm = now.toTimeString().slice(0, 5), today = dkey(now);
+    const fired = store.get("ns_fired", {});
+    const fire = async (id, title, body) => {
+      if (fired[id] === today) return;
+      fired[id] = today; store.set("ns_fired", fired);
+      const reg = await navigator.serviceWorker?.getRegistration?.();
+      if (reg) reg.showNotification(title, { body, icon: "icons/icon-192.png", badge: "icons/icon-192.png", tag: id });
+      else new Notification(title, { body, icon: "icons/icon-192.png" });
+    };
+    for (const k of MEAL_ORDER) if (n[k] && n[k] === hm) fire("meal_" + k, "NutriScan", `¿Qué tal tu ${MEAL_TYPES[k].toLowerCase()}? Escanéala en un momento 📸`);
+    if (n.water && now.getMinutes() === 0 && now.getHours() >= 9 && now.getHours() <= 21 && now.getHours() % 2 === 1) fire("water_" + now.getHours(), "NutriScan", "Un vaso de agua cuando te apetezca 💧");
+  }, 30000);
+}
+
+/* ════════════════ Acciones ════════════════ */
+const ACT = {
+  "tab": (el) => { S.tab = el.dataset.tab; render(S.tab); if (S.tab === "history" && !S.hist.loaded) loadMonth(); if (S.tab === "nutrition" && !S.nut.loaded) loadNut(); if (S.tab === "home" && !S.day.loaded) loadDay(); },
+  "close-sheet": () => closeSheet(),
+  "local-mode": () => { store.set("ns_mode", "local"); startLocal(); },
+  "go-auth": () => {
+    closeSheet(true);
+    if (!CLOUD_READY) return toast("La base de datos en la nube aún no está configurada (config.js).", "err");
+    store.del("ns_mode"); S.mode = null; authMode = "register"; render("auth");
+  },
+  "welcome-next": () => { if (S.welcomeStep < WELCOME.length - 1) { S.welcomeStep++; render("welcome"); } else finishWelcome(); },
+  "welcome-skip": () => finishWelcome(),
+  "auth-mode": (el) => { authMode = el.dataset.m; render("auth"); },
+  "forgot": () => openSheet(`<h2>Recuperar contraseña</h2><p class="muted small">Te enviaremos un enlace para crear una nueva.</p><div class="field"><input class="input" id="fp-email" type="email" placeholder="tu@email.com" value="${esc($("#a-email")?.value || "")}"></div><button class="btn primary block" id="fp-go">Enviar enlace</button>`, (sh) => {
+    $("#fp-go", sh).onclick = async () => {
+      const { error } = await sb.auth.resetPasswordForEmail($("#fp-email", sh).value.trim(), { redirectTo: location.origin + location.pathname });
+      if (error) return toast(error.message, "err");
+      closeSheet(); toast("Revisa tu correo");
+    };
+  }),
+  "privacy": (el, e) => { e.preventDefault(); privacySheet(); },
+  "chip1": (el) => { const g = el.closest("[data-group]").dataset.group; S.profile[g] = el.dataset.v; $$(".chip", el.parentNode).forEach((c) => c.classList.toggle("on", c === el)); },
+  "chipN": (el) => {
+    const g = el.closest("[data-group]").dataset.group, v = el.dataset.v, arr = new Set(S.profile[g] || []);
+    arr.has(v) ? arr.delete(v) : arr.add(v);
+    el.classList.toggle("on");
+    if (el.dataset.save) saveProfile({ [g]: [...arr] }); else S.profile[g] = [...arr];
+  },
+  "ob-prev": () => { S.onboardStep--; render("onboard"); },
+  "ob-next": async () => {
+    if (S.onboardStep === 0) {
+      const age = $("#o-age").value ? Math.round(+$("#o-age").value) : null;
+      if (age != null && (age < 14 || age > 120)) return toast("NutriScan es para personas de 14 años o más.", "err");
+      Object.assign(S.profile, { display_name: $("#o-name").value.trim(), age, medical_flag: $("#o-med").checked });
+      if (isProtected() && S.profile.goal === "lose_gradual") S.profile.goal = "health";
+    }
+    const total = S.mode === "cloud" ? 4 : 3;
+    if (S.onboardStep < total - 1) { S.onboardStep++; render("onboard"); return; }
+    const p = S.profile;
+    const patch = { display_name: p.display_name, age: p.age, medical_flag: p.medical_flag, activity: p.activity, goal: p.goal, diet_prefs: p.diet_prefs, allergies: p.allergies, onboarded: true };
+    await saveProfile(patch);
+    S.tab = "home"; render("home"); loadDay();
+    if (isProtected()) setTimeout(() => toast("Te recomendamos fijar tus objetivos con un profesional sanitario."), 1500);
+  },
+  "water-add": async (el) => { try { await DB.addWater(+el.dataset.ml, new Date()); invalidate(); await loadDay(); toast("+" + el.dataset.ml + " ml de agua 💧"); } catch (e) { toast(e.message, "err"); } },
+  "water-undo": async () => { const last = S.day.water.at(-1); if (!last) return toast("Aún no has registrado agua hoy."); try { await DB.deleteWater(last.id); invalidate(); await loadDay(); } catch (e) { toast(e.message, "err"); } },
+  "scan-for": (el) => { S.pendingMealType = el.dataset.mt; S.tab = "scan"; render("scan"); },
+  "pick": (el) => { const inp = $(el.dataset.src === "camera" ? "#in-camera" : "#in-gallery"); inp.value = ""; inp.click(); },
+  "manual": () => { S.draft = { id: null, photoBlob: null, photo_url: null, items: [], meal_type: S.pendingMealType || autoMealType(), eaten_at: new Date(), title: "", notes: "", source: "manual" }; S.pendingMealType = null; render("results"); addItemSheet(); },
+  "add-past": () => { const d = new Date(S.hist.sel); d.setHours(13, 0, 0, 0); S.draft = { id: null, photoBlob: null, photo_url: null, items: [], meal_type: "lunch", eaten_at: d, title: "", notes: "", source: "manual" }; render("results"); },
+  "cancel-analysis": () => { analysisToken++; clearInterval(stepTimer); S.draft = null; render("scan"); },
+  "retry-analysis": () => { closeSheet(true); runAnalysis(); },
+  "discard": async () => {
+    if (!S.draft?.id && S.draft?.items.length && !(await confirmSheet("¿Descartar este registro?", "Perderás los alimentos identificados.", "Descartar"))) return;
+    S.draft = null; render(S.tab);
+  },
+  "add-item": () => addItemSheet(),
+  "del-item": (el) => { S.draft.items.splice(+el.closest(".item").dataset.i, 1); rerenderKeepScroll(); },
+  "grams": (el) => { const it = S.draft.items[+el.closest(".item").dataset.i]; it.grams = clamp(Math.round((Number(it.grams) || 0) + +el.dataset.d), 1, 3000); $("[data-field='grams']", el.closest(".item")).value = it.grams; refreshDraftNumbers(); },
+  "recalc-item": async (el) => {
+    const it = S.draft.items[+el.closest(".item").dataset.i];
+    el.innerHTML = `<span class="spinner" style="width:14px;height:14px;border-width:2px"></span>`;
+    try { const r = await ai("lookup", { name: it.name }); Object.assign(it, { per100g: r.per100g, source: r.source, confidence: null, _renamed: false }); rerenderKeepScroll(); toast("Nutrientes recalculados"); }
+    catch (e) { toast(e.message, "err"); rerenderKeepScroll(); }
+  },
+  "draft-type": (el) => { S.draft.meal_type = el.dataset.v; $$("[data-act='draft-type']").forEach((c) => c.classList.toggle("on", c === el)); },
+  "save-meal": () => saveDraft(),
+  "meal": (el) => { const m = findMeal(el.dataset.id); if (m) mealSheet(m); },
+  "edit-meal": (el) => {
+    const m = findMeal(el.dataset.id); closeSheet(true);
+    S.draft = { id: m.id, photoBlob: null, photo_url: m.photo_url, photo_path: m.photo_path, items: structuredClone(m.items || []), meal_type: m.meal_type, eaten_at: new Date(m.eaten_at), title: m.title || "", notes: m.notes || "", source: m.source };
+    render("results");
+  },
+  "del-meal": async (el) => {
+    const m = findMeal(el.dataset.id); closeSheet(true);
+    if (!(await confirmSheet("¿Eliminar esta comida?", "Se borrará el registro y su foto.", "Eliminar"))) return;
+    try { await DB.deleteMeal(m); invalidate(); toast("Comida eliminada"); await loadDay(); if (S.view === "history") loadMonth(); if (S.view === "nutrition") loadNut(); } catch (e) { toast(e.message, "err"); }
+  },
+  "hist-month": (el) => { const m = S.hist.month; S.hist.month = new Date(m.getFullYear(), m.getMonth() + +el.dataset.d, 1); S.hist.sel = S.hist.month; S.hist.loaded = false; render("history"); loadMonth(); },
+  "hist-day": (el) => { const [y, mo, d] = el.dataset.d.split("-").map(Number); S.hist.sel = new Date(y, mo - 1, d); rerenderKeepScroll(); },
+  "hist-mode": (el) => { S.hist.mode = el.dataset.m; rerenderKeepScroll(); },
+  "nut-period": (el) => { S.nut.period = el.dataset.p; S.nut.loaded = false; render("nutrition"); loadNut(); },
+  "open-chat": () => { render("chat"); },
+  "back-from-chat": () => render(S.tab),
+  "chat-suggest": (el) => sendChat(el.dataset.q),
+  "chat-clear": async () => { if (await confirmSheet("¿Borrar la conversación?", "Se eliminará el historial de este chat en este dispositivo.", "Borrar")) { S.chat = []; store.del(chatKey()); render("chat"); } },
+  "claude-sheet": () => { closeSheet(true); openSheet(claudeConnectHTML(), () => afterRender.claude()); },
+  "suggest-goals": async () => {
+    const g = suggestGoals(S.profile); if (!g) return;
+    if (!(await confirmSheet("Objetivos sugeridos", `Energía ${fmt(g.kcal_goal)} kcal · Proteínas ${g.protein_goal} g · Carbohidratos ${g.carbs_goal} g · Grasas ${g.fat_goal} g · Fibra ${g.fiber_goal} g · Agua ${fmt(g.water_goal_ml)} ml. Es una estimación orientativa (Mifflin-St Jeor). ¿Aplicarla?`, "Aplicar", false))) return;
+    await saveProfile(g, true);
+  },
+  "replay-tutorial": () => { S.welcomeStep = 0; S.replay = true; render("welcome"); },
+  "privacy-sheet": () => privacySheet(),
+  "export": () => exportData(),
+  "logout": async () => { if (await confirmSheet("¿Cerrar sesión?", "Tus datos seguirán guardados en tu cuenta.", "Cerrar sesión", false)) await sb.auth.signOut(); },
+  "delete-account": () => deleteAccount(),
+};
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("[data-act]");
+  if (!el || el.disabled) return;
+  const fn = ACT[el.dataset.act];
+  if (fn) { if (el.tagName === "A") e.preventDefault(); fn(el, e); }
+});
+$("#in-camera").onchange = (e) => onPhoto(e.target.files[0]);
+$("#in-gallery").onchange = async (e) => {
+  const f = e.target.files[0];
+  if (S.view === "results" && S.draft && !S.draft.photo_url && f) {
+    try { S.draft.photoBlob = await compressImage(f); S.draft.photo_url = URL.createObjectURL(S.draft.photoBlob); rerenderKeepScroll(); } catch { toast("No se pudo leer la imagen.", "err"); }
+    return;
+  }
+  onPhoto(f);
+};
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSheet(); });
+
+/* ════════════════ Arranque ════════════════ */
+function applyTheme() {
+  const t = store.get("ns_theme", "auto");
+  if (t === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t);
+  const dark = t === "dark" || (t === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
+  $('meta[name="theme-color"]').content = dark ? "#0A110D" : "#0F3B2C";
+}
+function finishWelcome() {
+  store.set("ns_welcomed", true);
+  if (S.replay) { S.replay = false; S.tab = "profile"; render("profile"); return; }
+  boot();
+}
+async function enterApp() {
+  try { S.profile = await DB.getProfile(); }
+  catch (e) {
+    S.profile = { ...DEFAULT_PROFILE };
+    toast(/relation|does not exist|schema/i.test(e.message) ? "La base de datos no tiene las tablas de NutriScan: ejecuta la migración SQL." : "No se pudo cargar tu perfil: " + e.message, "err");
+  }
+  S.chat = store.get(chatKey(), []);
+  await refreshAiStatus();
+  if (!S.profile.onboarded) { S.onboardStep = 0; render("onboard"); return; }
+  S.tab = "home"; S.day.loaded = false; render("home"); loadDay();
+}
+function startLocal() { S.mode = "local"; S.user = null; S.hist.loaded = S.nut.loaded = false; enterApp(); }
+let booted = false;
+async function boot() {
+  if (!store.get("ns_welcomed", false)) { render("welcome"); return; }
+  if (store.get("ns_mode") === "local") return startLocal();
+  if (!CLOUD_READY) return render("setup");
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) { S.mode = "cloud"; S.user = session.user; return enterApp(); }
+  render("auth");
+}
+if (sb) {
+  sb.auth.onAuthStateChange((event, session) => {
+    if (!booted || store.get("ns_mode") === "local") return;
+    if (event === "SIGNED_IN" && session && S.user?.id !== session.user.id) { S.mode = "cloud"; S.user = session.user; invalidate(); S.day = { date: sod(new Date()), meals: [], water: [], loaded: false }; enterApp(); }
+    if (event === "SIGNED_OUT") { S.mode = null; S.user = null; S.profile = null; S.chat = []; signed.clear(); authMode = "login"; render("auth"); }
+    if (event === "PASSWORD_RECOVERY") {
+      openSheet(`<h2>Nueva contraseña</h2><div class="field"><input class="input" id="np" type="password" minlength="8" placeholder="Mínimo 8 caracteres" autocomplete="new-password"></div><button class="btn primary block" id="np-go">Guardar</button>`, (sh) => {
+        $("#np-go", sh).onclick = async () => { const { error } = await sb.auth.updateUser({ password: $("#np", sh).value }); if (error) return toast(error.message, "err"); closeSheet(); toast("Contraseña actualizada"); };
+      });
+    }
+  });
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && S.profile && !sameDay(S.day.date, new Date())) { S.day.loaded = false; loadDay(); }
+});
+
+(function splash() {
+  applyTheme();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", applyTheme);
+  const sp = document.createElement("div");
+  sp.className = "splash";
+  sp.innerHTML = `<div><svg class="mark" style="display:block;margin:0 auto 18px"><use href="#logo"/></svg><div class="w">NutriScan</div><p>Eat smart. Live better.</p></div>`;
+  document.body.appendChild(sp);
+  const start = Date.now();
+  boot().catch((e) => { console.error(e); toast("Error al iniciar: " + e.message, "err"); }).finally(() => {
+    booted = true;
+    setTimeout(() => { sp.style.opacity = 0; setTimeout(() => sp.remove(), 500); }, Math.max(0, 1100 - (Date.now() - start)));
+  });
+  startReminders();
+  if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
+})();
+</script>
+</body>
+</html>
