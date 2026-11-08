@@ -89,7 +89,7 @@ supabase functions deploy nutriscan-ai
 Cuando tengas dominio propio, limita CORS con `supabase secrets set ALLOWED_ORIGIN=https://tudominio.com`.
 
 ### 3. Publicar la app (automático con GitHub)
-Al fusionar en `main`, dos flujos de GitHub Actions lo hacen todo solos:
+Con cada cambio en la rama por defecto del repositorio, dos flujos de GitHub Actions lo hacen todo solos:
 
 | Flujo | Qué hace | Resultado |
 |---|---|---|
